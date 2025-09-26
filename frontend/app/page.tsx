@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
-import { SeekerTopbar } from "@/components/seeker-topbar"
-import { SeekerSidebar } from "@/components/seeker-sidebar"
-import { SeekerEditor, type SeekerEditorHandle } from "@/components/seeker-editor"
+import { Topbar } from "@/components/Navbar"
+import { Sidebar } from "@/components/Sidebar"
+import { TextEditor, type EditorHandle } from "@/components/TextEditor"
 
 type FontStyle = "normal" | "retro" | "stylish"
 
@@ -20,7 +20,7 @@ export default function Page() {
   const [italic, setItalic] = useState(false)
   const [underline, setUnderline] = useState(false)
 
-  const editorRef = useRef<SeekerEditorHandle | null>(null)
+  const editorRef = useRef<EditorHandle | null>(null)
 
   useEffect(() => {
     function onMove(e: MouseEvent) {
@@ -70,13 +70,13 @@ export default function Page() {
     }
   }, [])
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
     return editorRef.current?.getSntContent() || ""
   }, [])
 
   return (
-    <div className={cn("h-screen seeker-gradient-bg flex flex-col")}>
-      <SeekerTopbar
+    <div className={cn("h-screen gradient-bg flex flex-col")}>
+      <Topbar
         visible={toolbarVisible}
         pinned={toolbarPinned}
         onTogglePinned={() => setToolbarPinned((p) => !p)}
@@ -95,14 +95,14 @@ export default function Page() {
         onToggleUnderline={() => editorRef.current?.toggleUnderline()}
       />
 
-      <div className="flex flex-1 min-h-0">
-        <SeekerSidebar
+      <div className="flex flex-1 h-full min-h-0">
+        <Sidebar
           collapsed={sidebarCollapsed}
           onToggle={() => setSidebarCollapsed((c) => !c)}
           onLoad={handleLoad}
           onSave={handleSave}
         />
-        <SeekerEditor ref={editorRef} fontStyle={fontStyle} onBodyClick={handleBodyClick} />
+        <TextEditor ref={editorRef} fontStyle={fontStyle} onBodyClick={handleBodyClick} />
       </div>
     </div>
   )

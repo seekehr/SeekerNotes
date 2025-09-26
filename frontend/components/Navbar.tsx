@@ -23,7 +23,7 @@ export interface TopbarProps {
   onToggleUnderline: () => void
 }
 
-export function SeekerTopbar(props: TopbarProps) {
+export function Topbar(props: TopbarProps) {
   const {
     visible,
     pinned,
@@ -52,7 +52,7 @@ export function SeekerTopbar(props: TopbarProps) {
 
   return (
     <div className={barClass} role="toolbar" aria-label="Editor toolbar">
-      <div className={cn("seeker-glass rounded-xl mt-3 mx-3 px-3 py-2")}>
+      <div className={cn("glass rounded-xl mt-3 mx-3 px-3 py-2")}>
         <div className="flex items-center gap-3">
           {/* Pin / Unpin */}
           <Button
@@ -60,7 +60,7 @@ export function SeekerTopbar(props: TopbarProps) {
             variant="outline"
             onClick={onTogglePinned}
             aria-pressed={pinned}
-            className={cn("h-9 px-3 rounded-md", pinned ? "seeker-pop" : "")}
+            className={cn("h-9 px-3 rounded-md", pinned ? "pop" : "")}
             title={pinned ? "Unpin toolbar" : "Pin toolbar"}
           >
             <span aria-hidden="true">{pinned ? "📌" : "📍"}</span>
@@ -94,7 +94,7 @@ export function SeekerTopbar(props: TopbarProps) {
                   "flex items-center justify-center",
                   "transition-transform",
                   "hover:scale-[1.03]",
-                  fontStyle === opt ? "seeker-pop border-foreground/40" : "",
+                  fontStyle === opt ? "pop border-foreground/40" : "",
                 )}
                 aria-pressed={fontStyle === opt}
                 aria-label={`${opt} font`}
@@ -115,7 +115,7 @@ export function SeekerTopbar(props: TopbarProps) {
               variant="outline"
               onClick={onToggleBold}
               aria-pressed={bold}
-              className={cn("h-9 px-3 rounded-md", bold ? "seeker-pop" : "")}
+              className={cn("h-9 px-3 rounded-md", bold ? "pop" : "")}
               title="Bold"
             >
               <span className="font-bold">B</span>
@@ -126,7 +126,7 @@ export function SeekerTopbar(props: TopbarProps) {
               variant="outline"
               onClick={onToggleItalic}
               aria-pressed={italic}
-              className={cn("h-9 px-3 rounded-md italic", italic ? "seeker-pop" : "")}
+              className={cn("h-9 px-3 rounded-md italic", italic ? "pop" : "")}
               title="Italic"
             >
               <span>I</span>
@@ -137,7 +137,7 @@ export function SeekerTopbar(props: TopbarProps) {
               variant="outline"
               onClick={onToggleUnderline}
               aria-pressed={underline}
-              className={cn("h-9 px-3 rounded-md", underline ? "seeker-pop" : "")}
+              className={cn("h-9 px-3 rounded-md", underline ? "pop" : "")}
               title="Underline"
             >
               <span className="underline decoration-2 underline-offset-2">U</span>

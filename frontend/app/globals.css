@@ -38,14 +38,13 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  /* SeekerNotes palette tokens (grey–purple) */
-  --seeker-purple-1: oklch(0.82 0.12 305);
-  --seeker-purple-2: oklch(0.7 0.15 305);
-  --seeker-gray-1: oklch(0.98 0.01 250);
-  --seeker-gray-2: oklch(0.2 0.02 250);
-  --seeker-glass-light: oklch(1 0 0 / 0.18);
-  --seeker-glass-dark: oklch(0.12 0 0 / 0.35);
-  --seeker-border: oklch(0.6 0.02 260 / 0.25);
+  --purple-1: oklch(0.82 0.12 305);
+  --purple-2: oklch(0.7 0.15 305);
+  --gray-1: oklch(0.98 0.01 250);
+  --gray-2: oklch(0.2 0.02 250);
+  --glass-light: oklch(1 0 0 / 0.18);
+  --glass-dark: oklch(0.12 0 0 / 0.35);
+  --border: oklch(0.6 0.02 260 / 0.25);
 }
 
 .dark {
@@ -134,39 +133,39 @@
 }
 
 /* Gradient background surface for the app shell */
-.seeker-gradient-bg {
+.gradient-bg {
   background-image: linear-gradient(
     135deg,
-    var(--seeker-gray-1) 0%,
-    var(--seeker-purple-1) 50%,
-    var(--seeker-purple-2) 100%
+    var(--gray-1) 0%,
+    var(--purple-1) 50%,
+    var(--purple-2) 100%
   );
 }
 
 /* Glass panels (translucent with blur) */
-.seeker-glass {
-  background-color: var(--seeker-glass-light);
+.glass {
+  background-color: var(--glass-light);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid var(--seeker-border);
+  border: 1px solid var(--border);
 }
 
 /* Darker glass, useful for overlays */
-.seeker-glass-dark {
-  background-color: var(--seeker-glass-dark);
+.glass-dark {
+  background-color: var(--glass-dark);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--seeker-border);
+  border: 1px solid var(--border);
 }
 
 /* "Pop" effect for selected controls */
-.seeker-pop {
+.pop {
   transform: translateY(-2px) scale(1.05);
   box-shadow: 0 8px 20px oklch(0 0 0 / 0.12);
 }
 
 /* Subtle top reveal zone for toolbar hover */
-.seeker-reveal-zone {
+.reveal-zone {
   pointer-events: auto;
   height: 16px;
   position: absolute;
