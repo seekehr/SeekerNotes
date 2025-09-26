@@ -11,15 +11,17 @@ export interface EditorHandle {
   applyFontSize: (size: number) => void
   getSntContent: () => Promise<string>
   setSntContent: (content: string) => void
+  getHtmlContent: () => string
 }
 
 interface EditorProps {
   fontStyle: FontStyle
   onBodyClick: () => void
+  onContentChange?: () => void
 }
 
 export const TextEditor = forwardRef<EditorHandle, EditorProps>(function TextEditor(props, ref) {
-  const { fontStyle, onBodyClick } = props
+  const { fontStyle, onBodyClick, onContentChange } = props
   const editorRef = useRef<HTMLDivElement>(null)
 
   const pickFont = (fontStyle: FontStyle): [string, string] => {
@@ -67,6 +69,9 @@ export const TextEditor = forwardRef<EditorHandle, EditorProps>(function TextEdi
         editorRef.current.innerHTML = sntToHtml(content)
       }
     },
+    getHtmlContent() {
+      return editorRef.current?.innerHTML || ""
+    },
   }))
 
   return (
@@ -82,6 +87,9 @@ export const TextEditor = forwardRef<EditorHandle, EditorProps>(function TextEdi
           contentEditable
           suppressContentEditableWarning
           onMouseDown={onBodyClick}
+          onInput={onContentChange}
+          onKeyUp={onContentChange}
+          onPaste={onContentChange}
           className={cn("h-full w-full p-8 outline-none", "text-pretty leading-relaxed")}
           style={{
             fontFamily: family,

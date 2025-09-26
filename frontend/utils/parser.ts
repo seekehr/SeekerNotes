@@ -70,7 +70,7 @@ export const sntToHtml = (snt: string): string => {
     // Convert line breaks to paragraphs
     const lines = html.split("\n").filter((line) => line.trim())
     if (lines.length === 0) {
-      return "<p>Start writing in SeekerNotes...</p>"
+      return "<p></p>"
     }
 
     return lines.map((line) => `<p>${line}</p>`).join("")

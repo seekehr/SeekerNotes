@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { Topbar } from "@/components/Navbar"
-import { Sidebar } from "@/components/Sidebar"
+import { Sidebar, type SidebarHandle } from "@/components/Sidebar"
 import { TextEditor, type EditorHandle } from "@/components/TextEditor"
+import { htmlToSnt, sntToHtml } from "@/utils/parser"
 
 type FontStyle = "normal" | "retro" | "stylish"
 
@@ -19,8 +20,21 @@ export default function Page() {
   const [bold, setBold] = useState(false)
   const [italic, setItalic] = useState(false)
   const [underline, setUnderline] = useState(false)
+  const [characterCount, setCharacterCount] = useState(0)
 
   const editorRef = useRef<EditorHandle | null>(null)
+  const sidebarRef = useRef<SidebarHandle | null>(null)
+
+  const updateCharacterCount = useCallback(() => {
+    const content = editorRef.current?.getHtmlContent() || ""
+    const textContent = content.replace(/<[^>]*>/g, '')
+    setCharacterCount(textContent.length)
+  }, [])
+
+  // Update character count on mount and when editor content changes
+  useEffect(() => {
+    updateCharacterCount()
+  }, [updateCharacterCount])
 
   useEffect(() => {
     function onMove(e: MouseEvent) {
@@ -68,11 +82,23 @@ export default function Page() {
       else if (fontName === "GEIST_STYLISH") setFontStyle("stylish")
       else setFontStyle("normal")
     }
-  }, [])
+
+    // Update character count after loading
+    setTimeout(updateCharacterCount, 0)
+  }, [updateCharacterCount])
 
   const handleSave = useCallback(async () => {
     return editorRef.current?.getSntContent() || ""
   }, [])
+
+  const handleGetCurrentContent = useCallback(() => {
+    return editorRef.current?.getHtmlContent() || ""
+  }, [])
+
+  const handleContentChange = useCallback(() => {
+    updateCharacterCount()
+    sidebarRef.current?.markActiveFileAsUnsaved()
+  }, [updateCharacterCount])
 
   return (
     <div className={cn("h-screen gradient-bg flex flex-col")}>
@@ -97,12 +123,17 @@ export default function Page() {
 
       <div className="flex flex-1 h-full min-h-0">
         <Sidebar
+          ref={sidebarRef}
           collapsed={sidebarCollapsed}
           onToggle={() => setSidebarCollapsed((c) => !c)}
           onLoad={handleLoad}
           onSave={handleSave}
+          getCurrentContent={handleGetCurrentContent}
+          fontStyle={fontStyle}
+          characterCount={characterCount}
+          onContentChange={handleContentChange}
         />
-        <TextEditor ref={editorRef} fontStyle={fontStyle} onBodyClick={handleBodyClick} />
+        <TextEditor ref={editorRef} fontStyle={fontStyle} onBodyClick={handleBodyClick} onContentChange={handleContentChange} />
       </div>
     </div>
   )

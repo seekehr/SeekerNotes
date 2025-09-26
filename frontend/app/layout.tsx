@@ -5,11 +5,11 @@ import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { Suspense } from "react"
+import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: "v0 App",
-  description: "Created with v0",
-  generator: "v0.app",
+  title: "SeekerNotes",
+  description: "A minimalistic, aesthetic note-taking system.",
 }
 
 export default function RootLayout({
@@ -24,6 +24,7 @@ export default function RootLayout({
           {children}
           <Analytics />
         </Suspense>
+        <Toaster />
       </body>
     </html>
   )
