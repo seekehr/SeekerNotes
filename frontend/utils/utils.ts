@@ -1,5 +1,9 @@
+// ONLY FOR COMPATIBILITY REASONS. WEB VERSION DOES NOT HAVE ANY CONFIG.
+export interface WebSafeConfig {
+    userSelectedDirectory: string;
+}
 
 export function isOnDesktop(): boolean {
     // @ts-expect-error
-     return typeof window.runtime !== "undefined";
+    return typeof window.runtime !== "undefined";
 }

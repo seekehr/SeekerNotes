@@ -7,13 +7,15 @@ import { GetStorage, SaveStorage } from "@/utils/storage_utils";
 import { OpenFolderDialog } from "@/wailsjs/go/main/App";
 import * as WailsRuntime from "@/wailsjs/runtime";
 import { toast } from "@/hooks/use-toast";
+import {config} from "@/wailsjs/go/models";
 
 interface SelectNotesDirFormProps {
+  conf: config.Config  
   onComplete: () => void;
 }
 
 // DESKTOP-ONLY.
-const SelectNotesDirForm = ({ onComplete }: SelectNotesDirFormProps) => {
+const SelectNotesDirForm = ({conf, onComplete }: SelectNotesDirFormProps) => {
   const [selectedPath, setSelectedPath] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -37,7 +39,6 @@ const SelectNotesDirForm = ({ onComplete }: SelectNotesDirFormProps) => {
     setIsLoading(true);
     
     try {
-        const conf = await GetStorage();
         conf.userSelectedDirectory = selectedPath;
         await SaveStorage(conf);
     } catch (error) {

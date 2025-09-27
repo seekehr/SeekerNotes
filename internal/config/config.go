@@ -19,7 +19,7 @@ type Config struct {
 
 // GetConfig - Returns the config if it exists. If not, create a new one and return it
 func GetConfig() (*Config, error) {
-	configDir, err := ensureConfigPathExists()
+	configDir, err := EnsureConfigPathExists()
 	if err != nil {
 		return nil, err
 	}
@@ -49,9 +49,9 @@ func GetConfig() (*Config, error) {
 	return &cfg, nil
 }
 
-// SaveConfig - Overwrites config.json with current values
+// SaveConfig - Overwrites config.json with new values
 func SaveConfig(config *Config) error {
-	configDir, err := ensureConfigPathExists()
+	configDir, err := EnsureConfigPathExists()
 	if err != nil {
 		return err
 	}
@@ -66,8 +66,8 @@ func SaveConfig(config *Config) error {
 	return os.WriteFile(configPath, data, 0644)
 }
 
-// ensureConfigPathExists - Creates config dir if missing
-func ensureConfigPathExists() (string, error) {
+// EnsureConfigPathExists - Creates config dir if missing. Returns config directory path (not file)
+func EnsureConfigPathExists() (string, error) {
 	baseDir, err := os.UserConfigDir()
 	if err != nil {
 		return "", err
@@ -93,4 +93,21 @@ func ensureConfigPathExists() (string, error) {
 	}
 
 	return configDir, nil
+}
+
+func (cfg *Config) IsUserDirValid() bool {
+	if cfg.UserSelectedDirectory == "" {
+		return false
+	}
+
+	if cfg.UserSelectedDirectory == "/" {
+		return false
+	}
+
+	info, err := os.Stat(cfg.UserSelectedDirectory)
+	if err != nil || !info.IsDir() {
+		return false
+	}
+
+	return true
 }

@@ -5,11 +5,19 @@ import { cn } from "@/lib/utils"
 import { Topbar } from "@/components/Navbar"
 import { Sidebar, type SidebarHandle } from "@/components/Sidebar"
 import { TextEditor, type EditorHandle } from "@/components/TextEditor"
-import { htmlToSnt, sntToHtml } from "@/utils/parser"
-
+import { isOnDesktop, WebSafeConfig } from "@/utils/utils"
+import WelcomeSetupForm from "@/components/setup/WelcomeSetupForm"
+import { toast } from "@/hooks/use-toast";
+import SelectNotesDirForm from "@/components/setup/SelectNotesDirForm"
+ 
 type FontStyle = "normal" | "retro" | "stylish"
 
 export default function Page() {
+  const [showWelcome, setShowWelcome] = useState(false)
+  const [showNotesDirForm, setShowNotesDirForm] = useState(false)
+
+  const [configLoaded, setConfigLoaded] = useState<WebSafeConfig | null>(null);
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   const [toolbarVisible, setToolbarVisible] = useState(true)
@@ -25,17 +33,42 @@ export default function Page() {
   const editorRef = useRef<EditorHandle | null>(null)
   const sidebarRef = useRef<SidebarHandle | null>(null)
 
+  // Check if on desktop, load config and show welcome form
+  useEffect(() => {
+    async function loadConfig() {
+      const { GetConfig } = await import("@/wailsjs/go/main/App");
+      const config = await GetConfig();
+      setConfigLoaded(config) // web safe config has the same shape; structural typing essentially
+    }
+
+    if (isOnDesktop()) {
+      try {
+        loadConfig()
+      } catch (error) {
+        toast({
+          title: "Error fetching config. Error: " + error,
+          description: "Please try again later.",
+          variant: "destructive",
+        });
+      }
+      setShowWelcome(true)
+    } else {
+      console.log("Not on desktop; skipping welcome form.")
+    }
+  }, [isOnDesktop, setShowWelcome, setConfigLoaded])
+
   const updateCharacterCount = useCallback(() => {
     const content = editorRef.current?.getHtmlContent() || ""
     const textContent = content.replace(/<[^>]*>/g, '')
     setCharacterCount(textContent.length)
   }, [])
 
-  // Update character count on mount and when editor content changes
+  // update char count on mount and when editor content changes
   useEffect(() => {
     updateCharacterCount()
   }, [updateCharacterCount])
 
+  // show toolbar
   useEffect(() => {
     function onMove(e: MouseEvent) {
       if (toolbarPinned) return
@@ -67,6 +100,7 @@ export default function Page() {
     }
   }, [])
 
+  // hide toolbar when editor is focused
   const handleBodyClick = useCallback(() => {
     if (!toolbarPinned) setToolbarVisible(false)
   }, [toolbarPinned])
@@ -99,6 +133,29 @@ export default function Page() {
     updateCharacterCount()
     sidebarRef.current?.markActiveFileAsUnsaved()
   }, [updateCharacterCount])
+
+  const handleWelcomeNext = useCallback(() => {
+    setShowWelcome(false)
+    setShowNotesDirForm(true)
+  }, [])
+
+  const handleSetupComplete = useCallback(() => {
+    setShowNotesDirForm(false)
+  }, [])
+
+  // Show welcome form if on desktop
+  if (showWelcome) {
+    // only load welcome form if smth needs initialisation ofc
+    if (configLoaded !== null && configLoaded.userSelectedDirectory === "") {
+      return <WelcomeSetupForm conf={configLoaded} onNext={handleWelcomeNext} />
+    }
+  }
+
+  if (showNotesDirForm) {
+    if (configLoaded !== null && configLoaded.userSelectedDirectory === "") {
+      return <SelectNotesDirForm conf={configLoaded} onComplete={handleSetupComplete} />
+    }
+  }
 
   return (
     <div className={cn("h-screen gradient-bg flex flex-col")}>

@@ -2,44 +2,35 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import { GetConfig, SaveConfig } from "@/wailsjs/go/main/App";
+import { config } from "@/wailsjs/go/models";
 import * as WailsRuntime from "@/wailsjs/runtime";
 import { toast } from "@/hooks/use-toast";
 
 interface WelcomeSetupFormProps {
+  conf: config.Config 
   onNext: () => void;
 }
 
 // DESKTOP-ONLY.
-const WelcomeSetupForm = ({ onNext }: WelcomeSetupFormProps) => {
+const WelcomeSetupForm = ({ conf, onNext }: WelcomeSetupFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLetsGo = async () => {
     setIsLoading(true);
     
     try {
-        // Check if notes directory is already set
-        const conf = await GetConfig();
-        if (conf !== null) {
-            // Simulate brief loading for better UX
-            await new Promise(resolve => setTimeout(resolve, 300));
-    
-            setIsLoading(false);
-    
-            // no directory set
-            if (conf.userSelectedDirectory === "" || conf.userSelectedDirectory === "/") {
-                onNext(); // Show SelectNotesDirForm
-            } else {
-                // Notes directory already set, continue to main app
-                WailsRuntime.LogInfo('Notes directory already configured');
-            }
-        } else {
-            WailsRuntime.LogFatal("Error fetching config. Config is null.");
-            toast({
-                title: "Error fetching config",
-                description: "Please try again later.",
-                variant: "destructive",
-            });
-        }
+         // Simulate brief loading for better UX
+         await new Promise(resolve => setTimeout(resolve, 300));
+         setIsLoading(false);
+ 
+         // no directory set
+         if (conf.userSelectedDirectory === "" || conf.userSelectedDirectory === "/") {
+             WailsRuntime.LogInfo('Notes directory not configured, showing dir form');
+             onNext(); // Show SelectNotesDirForm
+         } else {
+             // Notes directory already set, continue to main app
+             WailsRuntime.LogInfo('Notes directory already configured');
+         }
     } catch (error) {
         WailsRuntime.LogFatal("Error fetching config:" + error);
         toast({

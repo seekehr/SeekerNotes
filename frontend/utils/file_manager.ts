@@ -23,7 +23,7 @@ const DO_NOT_AUTO_SAVE_NAME = "New Note"
 export const loadSntFile = (file: File): Promise<FileOperationResult> => {
     return new Promise((resolve) => {
         if (!file.name.endsWith(".snt")) {
-            resolve({ success: false, error: "File must have .snt extension" })
+            resolve({ success: false, error: "File must have a .snt extension" })
             return
         }
 
