@@ -30,7 +30,7 @@ func LoadSNTsFromDir(conf *config.Config) ([]*FileData, error) {
 
 	files := make([]*FileData, 0, len(dir))
 	for _, file := range dir {
-		fileData, err := LoadSntFile(filepath.Join(conf.UserSelectedDirectory, file.Name()))
+		fileData, err := LoadSntFileFromPath(filepath.Join(conf.UserSelectedDirectory, file.Name()))
 		if err != nil {
 			fmt.Println("ERROR LOADING FILE", file.Name())
 			continue
@@ -40,8 +40,8 @@ func LoadSNTsFromDir(conf *config.Config) ([]*FileData, error) {
 	return files, nil
 }
 
-// LoadSntFile reads a .snt file from disk and returns its content. Returns in raw format
-func LoadSntFile(filePath string) (*FileData, error) {
+// LoadSntFileFromPath reads a .snt file from disk and returns its content. Returns in raw format
+func LoadSntFileFromPath(filePath string) (*FileData, error) {
 	if !strings.HasSuffix(filePath, ".snt") {
 		return nil, fmt.Errorf("file must have a .snt extension")
 	}
@@ -60,7 +60,7 @@ func LoadSntFile(filePath string) (*FileData, error) {
 	}, nil
 }
 
-func SaveFile(conf *config.Config, content string, fileName string) error {
+func SaveFileOnDesktop(conf *config.Config, content string, fileName string) error {
 	_, err := config.EnsureConfigPathExists()
 	if err != nil {
 		return err

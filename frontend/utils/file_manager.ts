@@ -1,3 +1,5 @@
+import { isOnDesktop, WebSafeConfig } from "./utils"
+
 export interface LoadedFile {
     name: string
     content: string
@@ -53,11 +55,23 @@ export const loadSntFile = (file: File): Promise<FileOperationResult> => {
 }
 
 /**
- * Save content as a .snt file
+ * Save content as a .snt file. TODO: make sidebar pass config to this
  */
-export const saveSntFile = (content: string, fileName: string): Promise<FileOperationResult> => {
-    return new Promise((resolve) => {
-        try {
+export const saveSntFile = async (conf: WebSafeConfig | undefined, content: string, fileName: string): Promise<FileOperationResult> => {
+    try {
+        // Check if we're on desktop first
+
+        if (isOnDesktop()) {
+            // Use desktop save functionality
+            const { SaveFileOnDesktop, GetConfig } = await import("../wailsjs/go/main/App")
+            if (conf === undefined) {
+                conf = await GetConfig()
+            }
+
+            await SaveFileOnDesktop(conf, content, fileName)
+            return { success: true }
+        } else {
+            // Use web save functionality (download)
             const blob = new Blob([content], { type: "text/plain" })
             const url = URL.createObjectURL(blob)
             const a = document.createElement("a")
@@ -67,11 +81,11 @@ export const saveSntFile = (content: string, fileName: string): Promise<FileOper
             a.click()
             document.body.removeChild(a)
             URL.revokeObjectURL(url)
-            resolve({ success: true })
-        } catch (error) {
-            resolve({ success: false, error: `Failed to save file: ${error}` })
+            return { success: true }
         }
-    })
+    } catch (error) {
+        return { success: false, error: `Failed to save file: ${error}` }
+    }
 }
 
 /**
@@ -82,9 +96,44 @@ export const autoSaveFile = async (
     sntContent: string
 ): Promise<FileOperationResult> => {
     try {
-        return await saveSntFile(sntContent, fileName)
+        return await saveSntFile(undefined, sntContent, fileName)
     } catch (error) {
         return { success: false, error: `Failed to save file "${fileName}": ${error}` }
+    }
+}
+
+/**
+ * Load all .SNT files from the configured directory
+ */
+export const LoadAllSntFiles = async (conf?: WebSafeConfig): Promise<FileOperationResult & { files?: LoadedFile[] }> => {
+    try {
+        if (isOnDesktop()) {
+            // Use desktop functionality to load all files from directory
+            const { LoadSNTsFromDir, GetConfig } = await import("../wailsjs/go/main/App")
+
+            if (conf === undefined) {
+                conf = await GetConfig()
+            }
+
+            const fileDataArray = await LoadSNTsFromDir(conf)
+
+            // Convert the Go FileData structs to LoadedFile objects
+            const loadedFiles: LoadedFile[] = fileDataArray.map((fileData: any) => ({
+                name: fileData.name.replace('.snt', ''), // Remove .snt extension for display
+                content: fileData.content,
+                htmlContent: fileData.htmlContent || "", // Use provided HTML or empty string
+                filePath: fileData.name,
+                isSaved: true,
+                originalContent: fileData.content
+            }))
+
+            return { success: true, files: loadedFiles }
+        } else {
+            // Web version doesn't have directory access, return empty array
+            return { success: true, files: [] }
+        }
+    } catch (error) {
+        return { success: false, error: `Failed to load files from directory: ${error}` }
     }
 }
 

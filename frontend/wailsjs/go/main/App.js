@@ -6,10 +6,22 @@ export function GetConfig() {
   return window['go']['main']['App']['GetConfig']();
 }
 
+export function LoadSNTsFromDir(arg1) {
+  return window['go']['main']['App']['LoadSNTsFromDir'](arg1);
+}
+
+export function LoadSntFileFromPath(arg1) {
+  return window['go']['main']['App']['LoadSntFileFromPath'](arg1);
+}
+
 export function OpenFolderDialog() {
   return window['go']['main']['App']['OpenFolderDialog']();
 }
 
 export function SaveConfig(arg1) {
   return window['go']['main']['App']['SaveConfig'](arg1);
+}
+
+export function SaveFileOnDesktop(arg1, arg2, arg3) {
+  return window['go']['main']['App']['SaveFileOnDesktop'](arg1, arg2, arg3);
 }

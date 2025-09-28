@@ -2,6 +2,7 @@ package main
 
 import (
 	"SeekerNotes/internal/config"
+	"SeekerNotes/internal/files"
 	"context"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -38,4 +39,17 @@ func (a *App) OpenFolderDialog() (string, error) {
 	return runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{
 		Title: "Select a folder",
 	})
+}
+
+func (a *App) LoadSNTsFromDir(conf *config.Config) ([]*files.FileData, error) {
+	return files.LoadSNTsFromDir(conf)
+}
+
+// LoadSntFileFromPath reads a .snt file from disk and returns its content. Returns in raw format
+func (a *App) LoadSntFileFromPath(filePath string) (*files.FileData, error) {
+	return files.LoadSntFileFromPath(filePath)
+}
+
+func (a *App) SaveFileOnDesktop(conf *config.Config, content string, fileName string) error {
+	return files.SaveFileOnDesktop(conf, content, fileName)
 }

@@ -2,7 +2,8 @@
 
 import { forwardRef, useImperativeHandle, useRef } from "react"
 import { cn } from "@/lib/utils"
-import { FontStyle, applyFormatting, htmlToSnt, sntToHtml } from "@/utils/parser"
+import { FontStyle, htmlToSnt, sntToHtml } from "@/utils/parser"
+import { BoldStyle, ItalicStyle, UnderlineStyle } from "@/utils/styles/Styles"
 
 export interface EditorHandle {
   toggleBold: () => void
@@ -15,13 +16,14 @@ export interface EditorHandle {
 }
 
 interface EditorProps {
+  styles: {bold: BoldStyle, italic: ItalicStyle, und: UnderlineStyle}
   fontStyle: FontStyle
   onBodyClick: () => void
   onContentChange?: () => void
 }
 
 export const TextEditor = forwardRef<EditorHandle, EditorProps>(function TextEditor(props, ref) {
-  const { fontStyle, onBodyClick, onContentChange } = props
+  const { fontStyle, onBodyClick, onContentChange, styles } = props
   const editorRef = useRef<HTMLDivElement>(null)
 
   const pickFont = (fontStyle: FontStyle): [string, string] => {
@@ -47,18 +49,30 @@ export const TextEditor = forwardRef<EditorHandle, EditorProps>(function TextEdi
   useImperativeHandle(ref, () => ({
     toggleBold() {
       focusEditor()
-      applyFormatting('strong')
+      styles.bold.apply()
+      // Trigger a selection change event to update state
+      setTimeout(() => {
+        document.dispatchEvent(new Event('selectionchange'))
+      }, 0)
     },
     toggleItalic() {
       focusEditor()
-      applyFormatting('em')
+      styles.italic.apply()
+      // Trigger a selection change event to update state
+      setTimeout(() => {
+        document.dispatchEvent(new Event('selectionchange'))
+      }, 0)
     },
     toggleUnderline() {
       focusEditor()
-      applyFormatting('u')
+      styles.und.apply()
+      // Trigger a selection change event to update state
+      setTimeout(() => {
+        document.dispatchEvent(new Event('selectionchange'))
+      }, 0)
     },
-    applyFontSize(size: number) {
-      applyFormatting('span', `font-size: ${size}px`)
+    applyFontSize(size: number) { // TODO
+      //applyFormatting('span', `font-size: ${size}px`)
     },
     async getSntContent() {
       const html = editorRef.current?.innerHTML || ""

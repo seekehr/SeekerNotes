@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -25,15 +25,16 @@ interface SidebarProps {
   fontStyle: "normal" | "retro" | "stylish"
   characterCount?: number
   onContentChange?: () => void
+  initialFiles?: LoadedFile[]
 }
 
 export interface SidebarHandle {
   markActiveFileAsUnsaved: () => void
 }
 
-export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar({ collapsed, onToggle, onLoad, onSave, getCurrentContent, fontStyle, characterCount = 0, onContentChange }, ref) {
+export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar({ collapsed, onToggle, onLoad, onSave, getCurrentContent, fontStyle, characterCount = 0, onContentChange, initialFiles }, ref) {
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [loadedFiles, setLoadedFiles] = useState<LoadedFile[]>([createNewNote()])
+  const [loadedFiles, setLoadedFiles] = useState<LoadedFile[]>(initialFiles || [createNewNote()])
   const [activeFileIndex, setActiveFileIndex] = useState<number | null>(0)
   const [error, setError] = useState<string | null>(null)
   const [editingName, setEditingName] = useState<string>("")
@@ -61,6 +62,16 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
     
     return currentText !== originalText
   }
+
+  // Update loaded files when initialFiles prop changes
+  React.useEffect(() => {
+    if (initialFiles && initialFiles.length > 0) {
+      setLoadedFiles(initialFiles)
+      setActiveFileIndex(0)
+      // Load the first file's content
+      onLoad(initialFiles[0].content)
+    }
+  }, [initialFiles, onLoad])
 
   useImperativeHandle(ref, () => ({
     markActiveFileAsUnsaved
@@ -104,6 +115,7 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
     }
   }
 
+  // Force close a file
   const closeFileDirectly = (index: number) => {
     // Remove file from loaded files
     setLoadedFiles(prev => prev.filter((_, i) => i !== index))
@@ -126,6 +138,7 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
     }
   }
 
+  // Save file
   const handleConfirmSave = async () => {
     if (!fileToClose || !getCurrentContent) return
 
@@ -171,7 +184,7 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
     const activeFile = activeFileIndex !== null ? loadedFiles[activeFileIndex] : null
     const fileName = activeFile?.name || `notes-${Date.now()}`
 
-    const result = await saveSntFile(content, fileName)
+    const result = await saveSntFile(undefined, content, fileName)
 
     if (result.success && activeFileIndex !== null && getCurrentContent) {
       // Mark active file as saved and update original content

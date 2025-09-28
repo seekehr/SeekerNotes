@@ -2,14 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
-import { Topbar } from "@/components/Navbar"
+import { Topbar } from "@/components/Topbar"
 import { Sidebar, type SidebarHandle } from "@/components/Sidebar"
 import { TextEditor, type EditorHandle } from "@/components/TextEditor"
 import { isOnDesktop, WebSafeConfig } from "@/utils/utils"
 import WelcomeSetupForm from "@/components/setup/WelcomeSetupForm"
 import { toast } from "@/hooks/use-toast";
 import SelectNotesDirForm from "@/components/setup/SelectNotesDirForm"
- 
+import { BoldStyle, ItalicStyle, UnderlineStyle } from "@/utils/styles/Styles"
+import { LoadAllSntFiles, LoadedFile, createNewNote } from "@/utils/file_manager"
+
 type FontStyle = "normal" | "retro" | "stylish"
 
 export default function Page() {
@@ -17,6 +19,7 @@ export default function Page() {
   const [showNotesDirForm, setShowNotesDirForm] = useState(false)
 
   const [configLoaded, setConfigLoaded] = useState<WebSafeConfig | null>(null);
+  const [initialFiles, setInitialFiles] = useState<LoadedFile[]>([createNewNote()]);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
@@ -25,20 +28,36 @@ export default function Page() {
 
   const [fontStyle, setFontStyle] = useState<FontStyle>("normal")
   const [fontSize, setFontSize] = useState<number>(16)
-  const [bold, setBold] = useState(false)
-  const [italic, setItalic] = useState(false)
-  const [underline, setUnderline] = useState(false)
+  const styles = { bold: new BoldStyle(), italic: new ItalicStyle(), und: new UnderlineStyle() }
   const [characterCount, setCharacterCount] = useState(0)
+  const [, forceUpdate] = useState({})
 
   const editorRef = useRef<EditorHandle | null>(null)
   const sidebarRef = useRef<SidebarHandle | null>(null)
 
-  // Check if on desktop, load config and show welcome form
+  // Check if on desktop, load config, load notes and show welcome form (if config is not properly intiialised)
   useEffect(() => {
     async function loadConfig() {
       const { GetConfig } = await import("@/wailsjs/go/main/App");
       const config = await GetConfig();
       setConfigLoaded(config) // web safe config has the same shape; structural typing essentially
+      
+      // Load all SNT files if config is valid
+      if (config.userSelectedDirectory && config.userSelectedDirectory !== "") {
+        try {
+          const result = await LoadAllSntFiles(config);
+          if (result.success && result.files && result.files.length > 0) {
+            setInitialFiles(result.files);
+          }
+        } catch (error) {
+          console.error("Failed to load SNT files:", error);
+          toast({
+            title: "Error loading notes",
+            description: "Failed to load existing notes from directory.",
+            variant: "destructive",
+          });
+        }
+      }
     }
 
     if (isOnDesktop()) {
@@ -56,6 +75,7 @@ export default function Page() {
       console.log("Not on desktop; skipping welcome form.")
     }
   }, [isOnDesktop, setShowWelcome, setConfigLoaded])
+
 
   const updateCharacterCount = useCallback(() => {
     const content = editorRef.current?.getHtmlContent() || ""
@@ -81,11 +101,17 @@ export default function Page() {
 
   useEffect(() => {
     const updateStates = () => {
-      const doc: any = document as any
       try {
-        setBold(!!doc?.queryCommandState?.("bold"))
-        setItalic(!!doc?.queryCommandState?.("italic"))
-        setUnderline(!!doc?.queryCommandState?.("underline"))
+        const boldState = !!document.queryCommandState("bold")
+        const italicState = !!document.queryCommandState("italic")
+        const underlineState = !!document.queryCommandState("underline")
+
+        styles.bold.setState(boldState)
+        styles.italic.setState(italicState)
+        styles.und.setState(underlineState)
+
+        // Force re-render to update Topbar
+        forceUpdate({})
       } catch {
         // ignore
       }
@@ -98,7 +124,7 @@ export default function Page() {
       window.removeEventListener("keyup", updateStates)
       window.removeEventListener("mouseup", updateStates)
     }
-  }, [])
+  }, [styles, forceUpdate])
 
   // hide toolbar when editor is focused
   const handleBodyClick = useCallback(() => {
@@ -132,7 +158,25 @@ export default function Page() {
   const handleContentChange = useCallback(() => {
     updateCharacterCount()
     sidebarRef.current?.markActiveFileAsUnsaved()
-  }, [updateCharacterCount])
+
+    // Update formatting states
+    setTimeout(() => {
+      try {
+        const boldState = !!document.queryCommandState("bold")
+        const italicState = !!document.queryCommandState("italic")
+        const underlineState = !!document.queryCommandState("underline")
+
+        styles.bold.setState(boldState)
+        styles.italic.setState(italicState)
+        styles.und.setState(underlineState)
+
+        // Force re-render to update Topbar
+        forceUpdate({})
+      } catch {
+        // ignore
+      }
+    }, 0)
+  }, [updateCharacterCount, styles, forceUpdate])
 
   const handleWelcomeNext = useCallback(() => {
     setShowWelcome(false)
@@ -170,9 +214,7 @@ export default function Page() {
           setFontSize(n)
           editorRef.current?.applyFontSize(n)
         }}
-        bold={bold}
-        italic={italic}
-        underline={underline}
+        styles={styles}
         onToggleBold={() => editorRef.current?.toggleBold()}
         onToggleItalic={() => editorRef.current?.toggleItalic()}
         onToggleUnderline={() => editorRef.current?.toggleUnderline()}
@@ -189,8 +231,9 @@ export default function Page() {
           fontStyle={fontStyle}
           characterCount={characterCount}
           onContentChange={handleContentChange}
+          initialFiles={initialFiles}
         />
-        <TextEditor ref={editorRef} fontStyle={fontStyle} onBodyClick={handleBodyClick} onContentChange={handleContentChange} />
+        <TextEditor ref={editorRef} styles={styles} fontStyle={fontStyle} onBodyClick={handleBodyClick} onContentChange={handleContentChange} />
       </div>
     </div>
   )

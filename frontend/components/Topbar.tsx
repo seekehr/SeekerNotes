@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/lib/utils"
 import { isOnDesktop } from "@/utils/utils"
+import { BoldStyle, ItalicStyle, UnderlineStyle } from "@/utils/styles/Styles"
 
 type FontStyle = "normal" | "retro" | "stylish"
 
@@ -16,9 +17,7 @@ export interface TopbarProps {
   onFontStyleChange: (v: FontStyle) => void
   fontSize: number
   onFontSizeChange: (v: number) => void
-  bold: boolean
-  italic: boolean
-  underline: boolean
+  styles: { bold: BoldStyle, italic: ItalicStyle, und: UnderlineStyle }
   onToggleBold: () => void
   onToggleItalic: () => void
   onToggleUnderline: () => void
@@ -33,9 +32,7 @@ export function Topbar(props: TopbarProps) {
     onFontStyleChange,
     fontSize,
     onFontSizeChange,
-    bold,
-    italic,
-    underline,
+    styles,
     onToggleBold,
     onToggleItalic,
     onToggleUnderline,
@@ -115,8 +112,8 @@ export function Topbar(props: TopbarProps) {
               type="button"
               variant="outline"
               onClick={onToggleBold}
-              aria-pressed={bold}
-              className={cn("h-9 px-3 rounded-md", bold ? "pop" : "")}
+              aria-pressed={styles.bold.getState()}
+              className={cn("h-9 px-3 rounded-md", styles.bold.getState() ? "pop" : "")}
               title="Bold"
             >
               <span className="font-bold">B</span>
@@ -126,8 +123,8 @@ export function Topbar(props: TopbarProps) {
               type="button"
               variant="outline"
               onClick={onToggleItalic}
-              aria-pressed={italic}
-              className={cn("h-9 px-3 rounded-md italic", italic ? "pop" : "")}
+              aria-pressed={styles.italic.getState()}
+              className={cn("h-9 px-3 rounded-md italic", styles.italic.getState() ? "pop" : "")}
               title="Italic"
             >
               <span>I</span>
@@ -137,8 +134,8 @@ export function Topbar(props: TopbarProps) {
               type="button"
               variant="outline"
               onClick={onToggleUnderline}
-              aria-pressed={underline}
-              className={cn("h-9 px-3 rounded-md", underline ? "pop" : "")}
+              aria-pressed={styles.und.getState()}
+              className={cn("h-9 px-3 rounded-md", styles.und.getState() ? "pop" : "")}
               title="Underline"
             >
               <span className="underline decoration-2 underline-offset-2">U</span>

@@ -1,5 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef, RefObject } from "react"
-import { cn } from "@/lib/utils"
+import { RefObject } from "react"
 
 export type FontStyle = "normal" | "retro" | "stylish"
 
@@ -76,7 +75,7 @@ export const sntToHtml = (snt: string): string => {
     return lines.map((line) => `<p>${line}</p>`).join("")
 }
 
-export const normalizeFontTags = (px: number, editorRef: RefObject<HTMLDivElement>) => {
+/*export const normalizeFontTags = (px: number, editorRef: RefObject<HTMLDivElement>) => {
     const root = editorRef.current
     if (!root) return
     const fonts = root.querySelectorAll('font[size="7"]')
@@ -86,23 +85,4 @@ export const normalizeFontTags = (px: number, editorRef: RefObject<HTMLDivElemen
       while (node.firstChild) span.appendChild(node.firstChild)
       node.replaceWith(span)
     })
-}
-  
-
-export const applyFormatting = (tag: string, style?: string) => {
-    
-    const selection = window.getSelection()
-    if (!selection || selection.rangeCount === 0) return
-
-    const range = selection.getRangeAt(0)
-    if (range.collapsed) return
-
-    const selectedText = range.toString()
-    const element = document.createElement(tag)
-    if (style) element.setAttribute('style', style)
-    element.textContent = selectedText
-
-    range.deleteContents()
-    range.insertNode(element)
-    selection.removeAllRanges()
-}
+}*/
