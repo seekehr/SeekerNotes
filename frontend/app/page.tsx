@@ -11,7 +11,7 @@ import { toast } from "@/hooks/use-toast";
 import SelectNotesDirForm from "@/components/setup/SelectNotesDirForm"
 import { BoldStyle, ItalicStyle, UnderlineStyle } from "@/utils/styles/Styles"
 import { LoadAllSntFiles, LoadedFile, createNewNote } from "@/utils/file_manager"
-import { setTheme } from "@/utils/utils"
+import { initializeTheme } from "@/utils/utils"
 
 type FontStyle = "normal" | "retro" | "stylish"
 
@@ -36,51 +36,50 @@ export default function Page() {
   const editorRef = useRef<EditorHandle | null>(null)
   const sidebarRef = useRef<SidebarHandle | null>(null)
 
-  // Check if on desktop, load config, load notes and show welcome form (if config is not properly intiialised)
+  // Initialize theme first, then load config and files
   useEffect(() => {
-    async function loadConfig() {
-      const { GetConfig } = await import("@/wailsjs/go/main/App");
-      const config = await GetConfig();
-      setConfigLoaded(config) // web safe config has the same shape; structural typing essentially
+    async function initialize() {
+      // Initialize theme first
+      await initializeTheme();
       
-      // Set theme based on config
-      if (config.theme) {
-        await setTheme(config.theme as 'light' | 'dark');
-      }
-      
-      // Load all SNT files if config is valid
-      if (config.userSelectedDirectory && config.userSelectedDirectory !== "") {
+      if (isOnDesktop()) {
         try {
-          const result = await LoadAllSntFiles(config);
-          if (result.success && result.files && result.files.length > 0) {
-            setInitialFiles(result.files);
+          const { GetConfig } = await import("@/wailsjs/go/main/App");
+          const config = await GetConfig();
+          setConfigLoaded(config);
+          
+          // Load all SNT files if config is valid
+          if (config.userSelectedDirectory && config.userSelectedDirectory !== "") {
+            try {
+              const result = await LoadAllSntFiles(config);
+              if (result.success && result.files && result.files.length > 0) {
+                setInitialFiles(result.files);
+              }
+            } catch (error) {
+              console.error("Failed to load SNT files:", error);
+              toast({
+                title: "Error loading notes",
+                description: "Failed to load existing notes from directory.",
+                variant: "destructive",
+              });
+            }
           }
+          
+          setShowWelcome(true);
         } catch (error) {
-          console.error("Failed to load SNT files:", error);
           toast({
-            title: "Error loading notes",
-            description: "Failed to load existing notes from directory.",
+            title: "Error fetching config. Error: " + error,
+            description: "Please try again later.",
             variant: "destructive",
           });
         }
+      } else {
+        console.log("Not on desktop; skipping welcome form.");
       }
     }
 
-    if (isOnDesktop()) {
-      try {
-        loadConfig()
-      } catch (error) {
-        toast({
-          title: "Error fetching config. Error: " + error,
-          description: "Please try again later.",
-          variant: "destructive",
-        });
-      }
-      setShowWelcome(true)
-    } else {
-      console.log("Not on desktop; skipping welcome form.")
-    }
-  }, [isOnDesktop, setShowWelcome, setConfigLoaded])
+    initialize();
+  }, [])
 
 
   const updateCharacterCount = useCallback(() => {

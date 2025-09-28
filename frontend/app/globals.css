@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -60,7 +58,7 @@
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
+  --accent: oklch(0.67 0.18 300);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: oklch(0.637 0.237 25.331);
@@ -80,6 +78,25 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+
+  /* Cozy dark theme colors */
+  --cozy-start: oklch(0.28 0.08 300);
+  --cozy-end: oklch(0.2 0.12 305);
+  --panel: oklch(0.16 0.05 295);
+  --panel-border: oklch(0.32 0.05 300);
+
+  /* Updated custom variables using cozy colors */
+  --purple-1: oklch(0.28 0.08 300);
+  --purple-2: oklch(0.2 0.12 305);
+  --gray-1: oklch(0.16 0.05 295);
+  --gray-2: oklch(0.85 0.02 250);
+  --glass-light: oklch(0.16 0.05 295 / 0.2);
+  --glass-dark: oklch(0.12 0.08 305 / 0.35);
+  --border: oklch(0.32 0.05 300 / 0.3);
+
+  /* Cozy purple hover colors */
+  --purple-hover: oklch(0.32 0.05 300 / 0.25);
+  --purple-accent: oklch(0.67 0.18 300);
 }
 
 @theme inline {
@@ -127,6 +144,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -134,12 +152,15 @@
 
 /* Gradient background surface for the app shell */
 .gradient-bg {
-  background-image: linear-gradient(
-    135deg,
-    var(--gray-1) 0%,
-    var(--purple-1) 50%,
-    var(--purple-2) 100%
-  );
+  background-image: linear-gradient(135deg,
+      var(--gray-1) 0%,
+      var(--purple-1) 50%,
+      var(--purple-2) 100%);
+}
+
+/* Cozy gradient for dark theme */
+.dark .gradient-bg {
+  background: linear-gradient(135deg, var(--cozy-start), var(--cozy-end));
 }
 
 /* Glass panels (translucent with blur) */
@@ -156,6 +177,41 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border);
+}
+
+/* Dark theme specific styles */
+.dark .glass {
+  background-color: var(--glass-light);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.dark .glass-dark {
+  background-color: var(--glass-dark);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Dark theme button styles */
+.dark .font-button {
+  background: transparent !important;
+  color: white !important;
+  border: 1px solid var(--border) !important;
+}
+
+.dark .font-button:hover {
+  background: var(--purple-hover) !important;
+}
+
+.dark .formatting-button {
+  background: oklch(0.2 0 0) !important;
+  border: 1px solid oklch(0.2 0 0) !important;
+}
+
+.dark .formatting-button:hover {
+  background: var(--purple-hover) !important;
 }
 
 /* "Pop" effect for selected controls */

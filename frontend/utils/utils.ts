@@ -41,3 +41,26 @@ export async function setTheme(theme: 'light' | 'dark'): Promise<void> {
         document.documentElement.classList.remove('dark');
     }
 }
+
+export function getCurrentTheme(): 'light' | 'dark' {
+    return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+}
+
+export async function initializeTheme(): Promise<void> {
+    if (isOnDesktop()) {
+        try {
+            const { GetConfig } = await import("../wailsjs/go/main/App");
+            const config = await GetConfig();
+            if (config.theme) {
+                await setTheme(config.theme as 'light' | 'dark');
+            }
+        } catch (error) {
+            console.error("Failed to load theme config:", error);
+            // Default to light theme
+            await setTheme('light');
+        }
+    } else {
+        // Default to light theme for web
+        await setTheme('light');
+    }
+}

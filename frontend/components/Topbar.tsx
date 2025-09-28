@@ -88,7 +88,7 @@ export function Topbar(props: TopbarProps) {
                 type="button"
                 onClick={() => onFontStyleChange(opt)}
                 className={cn(
-                  "h-9 w-9 rounded-md border",
+                  "h-9 w-9 rounded-md border font-button",
                   "flex items-center justify-center",
                   "transition-transform",
                   "hover:scale-[1.03]",
@@ -98,7 +98,7 @@ export function Topbar(props: TopbarProps) {
                 aria-label={`${opt} font`}
                 title={`${opt} font`}
               >
-                <span className={cn("select-none font-bold", "text-[var(--color-primary-foreground)]")}>F</span>
+                <span className={cn("select-none font-bold")}>F</span>
               </button>
             ))}
           </div>
@@ -113,7 +113,7 @@ export function Topbar(props: TopbarProps) {
               variant="outline"
               onClick={onToggleBold}
               aria-pressed={styles.bold.getState()}
-              className={cn("h-9 px-3 rounded-md", styles.bold.getState() ? "pop" : "")}
+              className={cn("h-9 px-3 rounded-md formatting-button", styles.bold.getState() ? "pop" : "")}
               title="Bold"
             >
               <span className="font-bold">B</span>
@@ -124,7 +124,7 @@ export function Topbar(props: TopbarProps) {
               variant="outline"
               onClick={onToggleItalic}
               aria-pressed={styles.italic.getState()}
-              className={cn("h-9 px-3 rounded-md italic", styles.italic.getState() ? "pop" : "")}
+              className={cn("h-9 px-3 rounded-md italic formatting-button", styles.italic.getState() ? "pop" : "")}
               title="Italic"
             >
               <span>I</span>
@@ -135,7 +135,7 @@ export function Topbar(props: TopbarProps) {
               variant="outline"
               onClick={onToggleUnderline}
               aria-pressed={styles.und.getState()}
-              className={cn("h-9 px-3 rounded-md", styles.und.getState() ? "pop" : "")}
+              className={cn("h-9 px-3 rounded-md formatting-button", styles.und.getState() ? "pop" : "")}
               title="Underline"
             >
               <span className="underline decoration-2 underline-offset-2">U</span>

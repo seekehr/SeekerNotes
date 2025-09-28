@@ -295,7 +295,7 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
               size="sm"
               onClick={handleThemeToggle}
               aria-label={isDarkTheme ? "Switch to light theme" : "Switch to dark theme"}
-              className="h-6 w-6 p-0 bg-transparent border-none hover:bg-white/20"
+              className="h-6 w-6 p-0 bg-transparent border-none hover:bg-accent/30 dark:hover:bg-purple-500/30 transition-colors"
             >
               {isDarkTheme ? (
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -303,7 +303,7 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
                   <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
                 </svg>
               ) : (
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-600">
                   <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
                 </svg>
               )}
@@ -370,7 +370,7 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
                   <button
                     className={cn(
                       "text-left w-full rounded-md px-3 py-2 pr-8 transition-colors",
-                      "hover:bg-[var(--color-accent)]/30",
+                      "hover:bg-[var(--color-accent)]/30 dark:hover:bg-purple-500/20",
                       activeFileIndex === i && "bg-transparent"
                     )}
                     title={file.name}
