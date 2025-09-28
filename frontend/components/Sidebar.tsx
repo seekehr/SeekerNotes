@@ -4,7 +4,7 @@ import React from "react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { useRef, useState, forwardRef, useImperativeHandle } from "react"
+import { useRef, useState, forwardRef, useImperativeHandle, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
 import {
   LoadedFile,
@@ -15,6 +15,7 @@ import {
 } from "@/utils/file_manager"
 import { htmlToSnt, sntToHtml } from "@/utils/parser"
 import { ConfirmSaveForm } from "./ConfirmSaveForm"
+import { toggleTheme } from "@/utils/utils"
 
 interface SidebarProps {
   collapsed: boolean
@@ -40,6 +41,7 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
   const [editingName, setEditingName] = useState<string>("")
   const [showConfirmSave, setShowConfirmSave] = useState(false)
   const [fileToClose, setFileToClose] = useState<{ index: number; file: LoadedFile } | null>(null)
+  const [isDarkTheme, setIsDarkTheme] = useState(false)
   const { toast } = useToast()
 
   // Mark active file as unsaved when content changes
@@ -72,6 +74,24 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
       onLoad(initialFiles[0].content)
     }
   }, [initialFiles, onLoad])
+
+  // Track theme changes
+  useEffect(() => {
+    const checkTheme = () => {
+      setIsDarkTheme(document.documentElement.classList.contains('dark'))
+    }
+    
+    checkTheme()
+    
+    // Listen for theme changes
+    const observer = new MutationObserver(checkTheme)
+    observer.observe(document.documentElement, { 
+      attributes: true, 
+      attributeFilter: ['class'] 
+    })
+    
+    return () => observer.disconnect()
+  }, [])
 
   useImperativeHandle(ref, () => ({
     markActiveFileAsUnsaved
@@ -254,6 +274,10 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
     setEditingName(currentName)
   }
 
+  const handleThemeToggle = async () => {
+    await toggleTheme()
+  }
+
   return (
     <aside
       className={cn(
@@ -264,7 +288,27 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
     >
       <div className="glass h-full rounded-r-xl p-3 flex flex-col">
         <div className="flex items-center justify-between">
-          <div className={cn("text-sm font-medium", collapsed ? "sr-only" : "")}>Notes</div>
+          <div className={cn("flex items-center gap-2", collapsed ? "sr-only" : "")}>
+            <div className="text-sm font-medium">Notes</div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleThemeToggle}
+              aria-label={isDarkTheme ? "Switch to light theme" : "Switch to dark theme"}
+              className="h-6 w-6 p-0 bg-transparent border-none hover:bg-white/20"
+            >
+              {isDarkTheme ? (
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="5"/>
+                  <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                </svg>
+              ) : (
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+              )}
+            </Button>
+          </div>
           <div className="flex gap-1">
             <Button
               variant="outline"

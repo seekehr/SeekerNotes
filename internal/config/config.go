@@ -37,7 +37,7 @@ func GetConfig() (*Config, error) {
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		defaultCfg := &Config{
 			UserSelectedDirectory: "",
-			Theme:                 "light",
+			Theme:                 Light,
 		}
 		if err := SaveConfig(defaultCfg); err != nil {
 			return nil, err
@@ -65,9 +65,9 @@ func SaveConfig(config *Config) error {
 	if err != nil {
 		return err
 	}
-	
-	if config.Theme != "dark" && config.Theme != "light" {
-		config.Theme = "light"
+
+	if config.Theme != Dark && config.Theme != Light {
+		config.Theme = Light
 	}
 
 	configPath := filepath.Join(configDir, FileName)

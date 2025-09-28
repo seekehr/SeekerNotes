@@ -11,6 +11,7 @@ import { toast } from "@/hooks/use-toast";
 import SelectNotesDirForm from "@/components/setup/SelectNotesDirForm"
 import { BoldStyle, ItalicStyle, UnderlineStyle } from "@/utils/styles/Styles"
 import { LoadAllSntFiles, LoadedFile, createNewNote } from "@/utils/file_manager"
+import { setTheme } from "@/utils/utils"
 
 type FontStyle = "normal" | "retro" | "stylish"
 
@@ -41,6 +42,11 @@ export default function Page() {
       const { GetConfig } = await import("@/wailsjs/go/main/App");
       const config = await GetConfig();
       setConfigLoaded(config) // web safe config has the same shape; structural typing essentially
+      
+      // Set theme based on config
+      if (config.theme) {
+        await setTheme(config.theme as 'light' | 'dark');
+      }
       
       // Load all SNT files if config is valid
       if (config.userSelectedDirectory && config.userSelectedDirectory !== "") {

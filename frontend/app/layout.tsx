@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { Suspense } from "react"
 import { Toaster } from "@/components/ui/toaster"
+import { ThemeProvider } from "@/components/theme-provider"
 
 export const metadata: Metadata = {
   title: "SeekerNotes",
@@ -20,11 +21,18 @@ export default function RootLayout({
   return (
     <html lang="en" className="antialiased">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-        <Suspense>
-          {children}
-          <Analytics />
-        </Suspense>
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          <Suspense>
+            {children}
+            <Analytics />
+          </Suspense>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   )
