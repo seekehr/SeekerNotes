@@ -12,9 +12,16 @@ const (
 	FileName   = "config.json"
 )
 
-// Config struct (expand with whatever fields you need)
+type Theme string
+
+const (
+	Light Theme = "light"
+	Dark  Theme = "dark"
+)
+
 type Config struct {
 	UserSelectedDirectory string `json:"userSelectedDirectory"`
+	Theme                 Theme  `json:"theme"`
 }
 
 // GetConfig - Returns the config if it exists. If not, create a new one and return it
@@ -28,7 +35,10 @@ func GetConfig() (*Config, error) {
 
 	// if config dont exist, we create a neew one
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		defaultCfg := &Config{UserSelectedDirectory: ""}
+		defaultCfg := &Config{
+			UserSelectedDirectory: "",
+			Theme:                 "light",
+		}
 		if err := SaveConfig(defaultCfg); err != nil {
 			return nil, err
 		}
@@ -54,6 +64,10 @@ func SaveConfig(config *Config) error {
 	configDir, err := EnsureConfigPathExists()
 	if err != nil {
 		return err
+	}
+	
+	if config.Theme != "dark" && config.Theme != "light" {
+		config.Theme = "light"
 	}
 
 	configPath := filepath.Join(configDir, FileName)
