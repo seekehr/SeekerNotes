@@ -220,6 +220,72 @@
   box-shadow: 0 8px 20px oklch(0 0 0 / 0.12);
 }
 
+/* Subtle pop effect for formatting buttons (B, I, U) - Light mode */
+/* Ultra-specific selectors to override Button component styles */
+button[data-slot="button"].formatting-button.pop,
+button.formatting-button.pop.h-9.px-3.rounded-md,
+.formatting-button.pop[data-slot="button"],
+button.formatting-button.pop {
+  transform: translateY(-1px) scale(1.02) !important;
+  background-color: oklch(0.145 0 0) !important;
+  background: oklch(0.145 0 0) !important;
+  border-color: oklch(0.145 0 0) !important;
+  border: 1px solid oklch(0.145 0 0) !important;
+  color: oklch(1 0 0) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Override hover states for formatting buttons */
+button[data-slot="button"].formatting-button.pop:hover,
+button.formatting-button.pop.h-9.px-3.rounded-md:hover,
+.formatting-button.pop[data-slot="button"]:hover,
+button.formatting-button.pop:hover {
+  background-color: oklch(0.145 0 0) !important;
+  background: oklch(0.145 0 0) !important;
+  border-color: oklch(0.145 0 0) !important;
+  color: oklch(1 0 0) !important;
+}
+
+/* Target the span elements inside formatting buttons */
+button[data-slot="button"].formatting-button.pop span,
+button.formatting-button.pop.h-9.px-3.rounded-md span,
+.formatting-button.pop[data-slot="button"] span,
+button.formatting-button.pop span {
+  color: oklch(1 0 0) !important;
+}
+
+/* Subtle pop effect for formatting buttons (B, I, U) - Dark mode */
+.dark button[data-slot="button"].formatting-button.pop,
+.dark button.formatting-button.pop.h-9.px-3.rounded-md,
+.dark .formatting-button.pop[data-slot="button"],
+.dark button.formatting-button.pop {
+  transform: translateY(-1px) scale(1.02) !important;
+  background-color: oklch(1 0 0) !important;
+  background: oklch(1 0 0) !important;
+  border-color: oklch(1 0 0) !important;
+  border: 1px solid oklch(1 0 0) !important;
+  color: oklch(0.145 0 0) !important;
+}
+
+/* Override hover states for formatting buttons in dark mode */
+.dark button[data-slot="button"].formatting-button.pop:hover,
+.dark button.formatting-button.pop.h-9.px-3.rounded-md:hover,
+.dark .formatting-button.pop[data-slot="button"]:hover,
+.dark button.formatting-button.pop:hover {
+  background-color: oklch(1 0 0) !important;
+  background: oklch(1 0 0) !important;
+  border-color: oklch(1 0 0) !important;
+  color: oklch(0.145 0 0) !important;
+}
+
+/* Target the span elements inside formatting buttons in dark mode */
+.dark button[data-slot="button"].formatting-button.pop span,
+.dark button.formatting-button.pop.h-9.px-3.rounded-md span,
+.dark .formatting-button.pop[data-slot="button"] span,
+.dark button.formatting-button.pop span {
+  color: oklch(0.145 0 0) !important;
+}
+
 /* Subtle top reveal zone for toolbar hover */
 .reveal-zone {
   pointer-events: auto;

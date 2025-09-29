@@ -1,5 +1,2 @@
-# finish the desktop save (DONE)
-# finish the desktop loading (upon startup) (DONE)
-# store theme on desktop 
-# make bold/italic/underline toggle-able. (DONE)
-# improve the parser code
+# todo: fix topbar's B, I U not highlighting when u click on them, or press ctrl + shortcut.
+# also make it so if the text theyre holding is highlighted, they highlight too.

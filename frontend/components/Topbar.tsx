@@ -1,11 +1,10 @@
 "use client"
 
-import { useEffect, useMemo } from "react"
+import { useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/lib/utils"
-import { isOnDesktop } from "@/utils/utils"
-import { BoldStyle, ItalicStyle, UnderlineStyle } from "@/utils/styles/Styles"
+import { STYLE_CONFIG, StyleKey } from "@/hooks/use-styles-manager"
 
 type FontStyle = "normal" | "retro" | "stylish"
 
@@ -15,12 +14,16 @@ export interface TopbarProps {
   onTogglePinned: () => void
   fontStyle: FontStyle
   onFontStyleChange: (v: FontStyle) => void
-  fontSize: number
-  onFontSizeChange: (v: number) => void
-  styles: { bold: BoldStyle, italic: ItalicStyle, und: UnderlineStyle }
-  onToggleBold: () => void
-  onToggleItalic: () => void
-  onToggleUnderline: () => void
+  stylesManager: {
+    toggleStyle: (key: StyleKey) => void
+    isStyleActive: (key: StyleKey) => boolean
+    activeStyles: Set<StyleKey>
+    updateActiveStyles: () => void
+    fontSize: number
+    setFontSize: (size: number) => void
+  }
+  onToggleStyle: (key: StyleKey) => void
+  onApplyFontSize: (size: number) => void
 }
 
 export function Topbar(props: TopbarProps) {
@@ -30,12 +33,9 @@ export function Topbar(props: TopbarProps) {
     onTogglePinned,
     fontStyle,
     onFontStyleChange,
-    fontSize,
-    onFontSizeChange,
-    styles,
-    onToggleBold,
-    onToggleItalic,
-    onToggleUnderline,
+    stylesManager,
+    onToggleStyle,
+    onApplyFontSize,
   } = props
 
   const barClass = useMemo(
@@ -52,7 +52,6 @@ export function Topbar(props: TopbarProps) {
     <div className={barClass} role="toolbar" aria-label="Editor toolbar">
       <div className={cn("glass rounded-xl mt-3 mx-3 px-3 py-2")}>
         <div className="flex items-center gap-3">
-          {/* Pin / Unpin */}
           <Button
             type="button"
             variant="outline"
@@ -69,18 +68,21 @@ export function Topbar(props: TopbarProps) {
             <span className="text-xs opacity-80">Size</span>
             <div className="w-40">
               <Slider
-                value={[fontSize]}
+                value={[stylesManager.fontSize]}
                 min={4}
                 max={30}
                 step={1}
-                onValueChange={(v) => onFontSizeChange(v[0] ?? fontSize)}
+                onValueChange={(v) => {
+                  const newSize = v[0] ?? stylesManager.fontSize
+                  stylesManager.setFontSize(newSize)
+                  onApplyFontSize(newSize)
+                }}
                 aria-label="Font size"
               />
             </div>
-            <span className="text-xs tabular-nums w-6 text-center">{fontSize}</span>
+            <span className="text-xs tabular-nums w-6 text-center">{stylesManager.fontSize}</span>
           </div>
 
-          {/* Font options: Normal / Retro / Stylish */}
           <div className="flex items-center gap-2 ml-1">
             {(["normal", "retro", "stylish"] as const).map((opt) => (
               <button
@@ -103,47 +105,43 @@ export function Topbar(props: TopbarProps) {
             ))}
           </div>
 
-          {/* Divider */}
           <div className="h-6 w-px bg-[var(--color-border)]/60 mx-1" aria-hidden="true" />
 
-          {/* Bold / Italic / Underline */}
           <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onToggleBold}
-              aria-pressed={styles.bold.getState()}
-              className={cn("h-9 px-3 rounded-md formatting-button", styles.bold.getState() ? "pop" : "")}
-              title="Bold"
-            >
-              <span className="font-bold">B</span>
-              <span className="sr-only">Toggle bold</span>
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onToggleItalic}
-              aria-pressed={styles.italic.getState()}
-              className={cn("h-9 px-3 rounded-md italic formatting-button", styles.italic.getState() ? "pop" : "")}
-              title="Italic"
-            >
-              <span>I</span>
-              <span className="sr-only">Toggle italic</span>
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onToggleUnderline}
-              aria-pressed={styles.und.getState()}
-              className={cn("h-9 px-3 rounded-md formatting-button", styles.und.getState() ? "pop" : "")}
-              title="Underline"
-            >
-              <span className="underline decoration-2 underline-offset-2">U</span>
-              <span className="sr-only">Toggle underline</span>
-            </Button>
+            {Object.entries(STYLE_CONFIG).map(([key, config]) => {
+              const isActive = stylesManager.isStyleActive(key as StyleKey)
+              
+              let buttonContent: React.ReactNode
+              if (key === 'bold') {
+                buttonContent = <span className="font-bold">B</span>
+              } else if (key === 'italic') {
+                buttonContent = <span className="italic">I</span>
+              } else if (key === 'underline') {
+                buttonContent = <span className="underline decoration-2 underline-offset-2">U</span>
+              } else {
+                buttonContent = <span>{config.label[0]}</span>
+              }
+
+              return (
+                <Button
+                  key={key}
+                  type="button"
+                  variant="outline"
+                  onClick={() => onToggleStyle(key as StyleKey)}
+                  aria-pressed={isActive}
+                  className={cn(
+                    "h-9 px-3 rounded-md formatting-button",
+                    isActive ? "pop" : ""
+                  )}
+                  title={`${config.label} (${config.keybind})`}
+                >
+                  {buttonContent}
+                  <span className="sr-only">Toggle {config.label}</span>
+                </Button>
+              )
+            })}
           </div>
 
-          {/* Spacer */}
           <div className="flex-1" />
         </div>
       </div>

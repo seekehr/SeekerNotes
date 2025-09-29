@@ -9,9 +9,10 @@ import { isOnDesktop, WebSafeConfig } from "@/utils/utils"
 import WelcomeSetupForm from "@/components/setup/WelcomeSetupForm"
 import { toast } from "@/hooks/use-toast";
 import SelectNotesDirForm from "@/components/setup/SelectNotesDirForm"
-import { BoldStyle, ItalicStyle, UnderlineStyle } from "@/utils/styles/Styles"
 import { LoadAllSntFiles, LoadedFile, createNewNote } from "@/utils/file_manager"
 import { initializeTheme } from "@/utils/utils"
+import { useToolbarHandler } from "@/hooks/use-handle-toolbar"
+import { useStylesManager } from "@/hooks/use-styles-manager"
 
 type FontStyle = "normal" | "retro" | "stylish"
 
@@ -23,23 +24,18 @@ export default function Page() {
   const [initialFiles, setInitialFiles] = useState<LoadedFile[]>([createNewNote()]);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-
-  const [toolbarVisible, setToolbarVisible] = useState(true)
   const [toolbarPinned, setToolbarPinned] = useState(false)
+  const [toolbarVisible, setToolbarVisible] = useToolbarHandler(toolbarPinned)
 
   const [fontStyle, setFontStyle] = useState<FontStyle>("normal")
-  const [fontSize, setFontSize] = useState<number>(16)
-  const styles = { bold: new BoldStyle(), italic: new ItalicStyle(), und: new UnderlineStyle() }
+  const stylesManager = useStylesManager()
   const [characterCount, setCharacterCount] = useState(0)
-  const [, forceUpdate] = useState({})
 
   const editorRef = useRef<EditorHandle | null>(null)
   const sidebarRef = useRef<SidebarHandle | null>(null)
 
-  // Initialize theme first, then load config and files
   useEffect(() => {
     async function initialize() {
-      // Initialize theme first
       await initializeTheme();
       
       if (isOnDesktop()) {
@@ -48,7 +44,6 @@ export default function Page() {
           const config = await GetConfig();
           setConfigLoaded(config);
           
-          // Load all SNT files if config is valid
           if (config.userSelectedDirectory && config.userSelectedDirectory !== "") {
             try {
               const result = await LoadAllSntFiles(config);
@@ -88,58 +83,13 @@ export default function Page() {
     setCharacterCount(textContent.length)
   }, [])
 
-  // update char count on mount and when editor content changes
   useEffect(() => {
     updateCharacterCount()
   }, [updateCharacterCount])
 
-  // show toolbar
-  useEffect(() => {
-    function onMove(e: MouseEvent) {
-      if (toolbarPinned) return
-      const nearTop = e.clientY <= 48
-      setToolbarVisible(nearTop)
-    }
-    window.addEventListener("mousemove", onMove)
-    return () => window.removeEventListener("mousemove", onMove)
-  }, [toolbarPinned])
-
-  useEffect(() => {
-    const updateStates = () => {
-      try {
-        const boldState = !!document.queryCommandState("bold")
-        const italicState = !!document.queryCommandState("italic")
-        const underlineState = !!document.queryCommandState("underline")
-
-        styles.bold.setState(boldState)
-        styles.italic.setState(italicState)
-        styles.und.setState(underlineState)
-
-        // Force re-render to update Topbar
-        forceUpdate({})
-      } catch {
-        // ignore
-      }
-    }
-    document.addEventListener("selectionchange", updateStates)
-    window.addEventListener("keyup", updateStates)
-    window.addEventListener("mouseup", updateStates)
-    return () => {
-      document.removeEventListener("selectionchange", updateStates)
-      window.removeEventListener("keyup", updateStates)
-      window.removeEventListener("mouseup", updateStates)
-    }
-  }, [styles, forceUpdate])
-
-  // hide toolbar when editor is focused
-  const handleBodyClick = useCallback(() => {
-    if (!toolbarPinned) setToolbarVisible(false)
-  }, [toolbarPinned])
-
   const handleLoad = useCallback((content: string) => {
     editorRef.current?.setSntContent(content)
 
-    // Extract font style from content
     const fontMatch = content.match(/^\[FONT:([^\]]+)\]/)
     if (fontMatch) {
       const fontName = fontMatch[1]
@@ -148,9 +98,12 @@ export default function Page() {
       else setFontStyle("normal")
     }
 
-    // Update character count after loading
     setTimeout(updateCharacterCount, 0)
   }, [updateCharacterCount])
+
+  const handleBodyClick = useCallback(() => {
+    if (!toolbarPinned) setToolbarVisible(false)
+  }, [toolbarPinned, setToolbarVisible])
 
   const handleSave = useCallback(async () => {
     return editorRef.current?.getSntContent() || ""
@@ -163,25 +116,7 @@ export default function Page() {
   const handleContentChange = useCallback(() => {
     updateCharacterCount()
     sidebarRef.current?.markActiveFileAsUnsaved()
-
-    // Update formatting states
-    setTimeout(() => {
-      try {
-        const boldState = !!document.queryCommandState("bold")
-        const italicState = !!document.queryCommandState("italic")
-        const underlineState = !!document.queryCommandState("underline")
-
-        styles.bold.setState(boldState)
-        styles.italic.setState(italicState)
-        styles.und.setState(underlineState)
-
-        // Force re-render to update Topbar
-        forceUpdate({})
-      } catch {
-        // ignore
-      }
-    }, 0)
-  }, [updateCharacterCount, styles, forceUpdate])
+  }, [updateCharacterCount])
 
   const handleWelcomeNext = useCallback(() => {
     setShowWelcome(false)
@@ -192,9 +127,7 @@ export default function Page() {
     setShowNotesDirForm(false)
   }, [])
 
-  // Show welcome form if on desktop
   if (showWelcome) {
-    // only load welcome form if smth needs initialisation ofc
     if (configLoaded !== null && configLoaded.userSelectedDirectory === "") {
       return <WelcomeSetupForm conf={configLoaded} onNext={handleWelcomeNext} />
     }
@@ -214,15 +147,9 @@ export default function Page() {
         onTogglePinned={() => setToolbarPinned((p) => !p)}
         fontStyle={fontStyle}
         onFontStyleChange={setFontStyle}
-        fontSize={fontSize}
-        onFontSizeChange={(n) => {
-          setFontSize(n)
-          editorRef.current?.applyFontSize(n)
-        }}
-        styles={styles}
-        onToggleBold={() => editorRef.current?.toggleBold()}
-        onToggleItalic={() => editorRef.current?.toggleItalic()}
-        onToggleUnderline={() => editorRef.current?.toggleUnderline()}
+        stylesManager={stylesManager}
+        onToggleStyle={(key) => editorRef.current?.toggleStyle(key)}
+        onApplyFontSize={(size) => editorRef.current?.applyFontSize(size)}
       />
 
       <div className="flex flex-1 h-full min-h-0">
@@ -238,7 +165,13 @@ export default function Page() {
           onContentChange={handleContentChange}
           initialFiles={initialFiles}
         />
-        <TextEditor ref={editorRef} styles={styles} fontStyle={fontStyle} onBodyClick={handleBodyClick} onContentChange={handleContentChange} />
+        <TextEditor 
+          ref={editorRef} 
+          fontStyle={fontStyle} 
+          onBodyClick={handleBodyClick} 
+          onContentChange={handleContentChange}
+          stylesManager={stylesManager}
+        />
       </div>
     </div>
   )
