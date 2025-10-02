@@ -282,12 +282,12 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
     <aside
       className={cn(
         "relative z-20 h-full transition-[width] duration-300 ease-out",
-        collapsed ? "w-[64px]" : "w-[260px]",
+        collapsed ? "w-[48px]" : "w-[260px]",
       )}
       aria-label="Navigation"
     >
       <div className="glass h-full rounded-r-xl p-3 flex flex-col">
-        <div className="flex items-center justify-between">
+        <div className={cn("flex items-center", collapsed ? "justify-center" : "justify-between")}>
           <div className={cn("flex items-center gap-2", collapsed ? "sr-only" : "")}>
             <div className="text-sm font-medium">Notes</div>
             <Button
@@ -309,7 +309,7 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
               )}
             </Button>
           </div>
-          <div className={cn("flex", collapsed ? "flex-col gap-1" : "gap-1")}>
+          <div className={cn("flex", collapsed ? "flex-col gap-1 items-center" : "gap-1")}>
             <Button
               variant="outline"
               size="sm"

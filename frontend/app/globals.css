@@ -286,6 +286,31 @@ button.formatting-button.pop span {
   color: oklch(0.145 0 0) !important;
 }
 
+/* Additional high-specificity selectors for active formatting buttons */
+.formatting-button.pop[aria-pressed="true"],
+button.formatting-button.pop[aria-pressed="true"] {
+  background-color: oklch(0.145 0 0) !important;
+  border-color: oklch(0.145 0 0) !important;
+  color: oklch(1 0 0) !important;
+}
+
+.formatting-button.pop[aria-pressed="true"] span,
+button.formatting-button.pop[aria-pressed="true"] span {
+  color: oklch(1 0 0) !important;
+}
+
+.dark .formatting-button.pop[aria-pressed="true"],
+.dark button.formatting-button.pop[aria-pressed="true"] {
+  background-color: oklch(1 0 0) !important;
+  border-color: oklch(1 0 0) !important;
+  color: oklch(0.145 0 0) !important;
+}
+
+.dark .formatting-button.pop[aria-pressed="true"] span,
+.dark button.formatting-button.pop[aria-pressed="true"] span {
+  color: oklch(0.145 0 0) !important;
+}
+
 /* Subtle top reveal zone for toolbar hover */
 .reveal-zone {
   pointer-events: auto;

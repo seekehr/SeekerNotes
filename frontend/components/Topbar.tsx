@@ -137,7 +137,7 @@ export function Topbar(props: TopbarProps) {
                   aria-pressed={isActive}
                   className={cn(
                     "h-9 px-3 rounded-md formatting-button",
-                    isActive ? "pop" : ""
+                    isActive && "pop"
                   )}
                   title={`${config.label} (${config.keybind})`}
                 >
