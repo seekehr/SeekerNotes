@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
-import { GetConfig, SaveConfig } from "@/wailsjs/go/main/App";
-import { config } from "@/wailsjs/go/models";
-import * as WailsRuntime from "@/wailsjs/runtime";
+import { config } from "../../../wailsjs/go/models";
+import * as WailsRuntime from "../../../wailsjs/runtime";
 import { toast } from "@/hooks/use-toast";
 
 interface WelcomeSetupFormProps {

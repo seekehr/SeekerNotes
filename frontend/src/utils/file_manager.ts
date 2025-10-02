@@ -63,7 +63,7 @@ export const saveSntFile = async (conf: WebSafeConfig | undefined, content: stri
 
         if (isOnDesktop()) {
             // Use desktop save functionality
-            const { SaveFileOnDesktop, GetConfig } = await import("../wailsjs/go/main/App")
+            const { SaveFileOnDesktop, GetConfig } = await import("../../wailsjs/go/main/App")
             if (conf === undefined) {
                 conf = await GetConfig()
             }
@@ -109,7 +109,7 @@ export const LoadAllSntFiles = async (conf?: WebSafeConfig): Promise<FileOperati
     try {
         if (isOnDesktop()) {
             // Use desktop functionality to load all files from directory
-            const { LoadSNTsFromDir, GetConfig } = await import("../wailsjs/go/main/App")
+            const { LoadSNTsFromDir, GetConfig } = await import("../../wailsjs/go/main/App")
 
             if (conf === undefined) {
                 conf = await GetConfig()

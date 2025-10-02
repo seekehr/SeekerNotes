@@ -1,5 +1,5 @@
-import { GetConfig, SaveConfig } from "@/wailsjs/go/main/App";
-import { config } from "@/wailsjs/go/models";
+import { GetConfig, SaveConfig } from "../../wailsjs/go/main/App";
+import { config } from "../../wailsjs/go/models";
 
 export async function GetStorage(): Promise<config.Config> {
     return await GetConfig();

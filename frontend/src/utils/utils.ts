@@ -23,7 +23,7 @@ export async function toggleTheme(): Promise<void> {
     // Save to config if on desktop
     if (isOnDesktop()) {
         try {
-            const { GetConfig, SaveConfig } = await import("../wailsjs/go/main/App");
+            const { GetConfig, SaveConfig } = await import("../../wailsjs/go/main/App");
             const config = await GetConfig();
             config.theme = newTheme;
             await SaveConfig(config);
@@ -49,7 +49,7 @@ export function getCurrentTheme(): 'light' | 'dark' {
 export async function initializeTheme(): Promise<void> {
     if (isOnDesktop()) {
         try {
-            const { GetConfig } = await import("../wailsjs/go/main/App");
+            const { GetConfig } = await import("../../wailsjs/go/main/App");
             const config = await GetConfig();
             if (config.theme) {
                 await setTheme(config.theme as 'light' | 'dark');

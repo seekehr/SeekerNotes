@@ -3,11 +3,11 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { FolderOpen } from "lucide-react";
-import { GetStorage, SaveStorage } from "@/utils/storage_utils";
-import { OpenFolderDialog } from "@/wailsjs/go/main/App";
-import * as WailsRuntime from "@/wailsjs/runtime";
+import { SaveStorage } from "@/utils/storage_utils";
+import { OpenFolderDialog } from "../../../wailsjs/go/main/App";
+import * as WailsRuntime from "../../../wailsjs/runtime";
 import { toast } from "@/hooks/use-toast";
-import {config} from "@/wailsjs/go/models";
+import {config} from "../../../wailsjs/go/models";
 
 interface SelectNotesDirFormProps {
   conf: config.Config  

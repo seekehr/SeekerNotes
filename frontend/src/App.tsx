@@ -39,13 +39,13 @@ function App() {
   useEffect(() => {
     async function initialize() {
       await initializeTheme();
-      
+
       if (isOnDesktop()) {
         try {
-          const { GetConfig } = await import("@/wailsjs/go/main/App");
+          const { GetConfig } = await import("../wailsjs/go/main/App");
           const config = await GetConfig();
           setConfigLoaded(config);
-          
+
           if (config.userSelectedDirectory && config.userSelectedDirectory !== "") {
             try {
               const result = await LoadAllSntFiles(config);
@@ -61,7 +61,7 @@ function App() {
               });
             }
           }
-          
+
           setShowWelcome(true);
         } catch (error) {
           toast({
@@ -182,10 +182,10 @@ function App() {
               onContentChange={handleContentChange}
               initialFiles={initialFiles}
             />
-            <TextEditor 
-              ref={editorRef} 
-              fontStyle={fontStyle} 
-              onBodyClick={handleBodyClick} 
+            <TextEditor
+              ref={editorRef}
+              fontStyle={fontStyle}
+              onBodyClick={handleBodyClick}
               onContentChange={handleContentChange}
               stylesManager={stylesManager}
               fontSizeManager={fontSizeManager}
