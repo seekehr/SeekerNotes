@@ -1,5 +1,3 @@
-"use client"
-
 import React from "react"
 
 import { cn } from "@/lib/utils"
@@ -47,7 +45,7 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
   // Mark active file as unsaved when content changes
   const markActiveFileAsUnsaved = () => {
     if (activeFileIndex !== null) {
-      setLoadedFiles(prev => prev.map((file, i) => 
+      setLoadedFiles(prev => prev.map((file, i) =>
         i === activeFileIndex ? { ...file, isSaved: false } : file
       ))
     }
@@ -56,12 +54,12 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
   // Check if current content differs from original
   const hasUnsavedChanges = (fileIndex: number): boolean => {
     if (fileIndex !== activeFileIndex || !getCurrentContent) return false
-    
+
     const file = loadedFiles[fileIndex]
     const currentHtml = getCurrentContent()
     const currentText = currentHtml.replace(/<[^>]*>/g, '')
     const originalText = (file.originalContent || file.content).replace(/<[^>]*>/g, '')
-    
+
     return currentText !== originalText
   }
 
@@ -80,16 +78,16 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
     const checkTheme = () => {
       setIsDarkTheme(document.documentElement.classList.contains('dark'))
     }
-    
+
     checkTheme()
-    
+
     // Listen for theme changes
     const observer = new MutationObserver(checkTheme)
-    observer.observe(document.documentElement, { 
-      attributes: true, 
-      attributeFilter: ['class'] 
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
     })
-    
+
     return () => observer.disconnect()
   }, [])
 
@@ -124,7 +122,7 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
     setError(null)
 
     const file = loadedFiles[index]
-    
+
     // Show confirmation dialog if this is the active file and has unsaved changes
     if (activeFileIndex === index && hasUnsavedChanges(index)) {
       setFileToClose({ index, file })
@@ -167,14 +165,14 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
     if (result.success) {
       // Mark file as saved and update original content
       const currentContent = getCurrentContent()
-      setLoadedFiles(prev => prev.map((file, i) => 
-        i === fileToClose.index ? { 
-          ...file, 
-          isSaved: true, 
-          originalContent: currentContent 
+      setLoadedFiles(prev => prev.map((file, i) =>
+        i === fileToClose.index ? {
+          ...file,
+          isSaved: true,
+          originalContent: currentContent
         } : file
       ))
-      
+
       closeFileDirectly(fileToClose.index)
       setShowConfirmSave(false)
       setFileToClose(null)
@@ -209,11 +207,11 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
     if (result.success && activeFileIndex !== null && getCurrentContent) {
       // Mark active file as saved and update original content
       const currentContent = getCurrentContent()
-      setLoadedFiles(prev => prev.map((file, i) => 
-        i === activeFileIndex ? { 
-          ...file, 
-          isSaved: true, 
-          originalContent: currentContent 
+      setLoadedFiles(prev => prev.map((file, i) =>
+        i === activeFileIndex ? {
+          ...file,
+          isSaved: true,
+          originalContent: currentContent
         } : file
       ))
     } else if (!result.success) {
@@ -231,13 +229,13 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
 
   const handleNameEdit = (index: number, newName: string) => {
     const trimmedName = newName.trim()
-    
+
     if (trimmedName === "") {
       newName = "New Note"
     }
 
     // Check if a note with the same name already exists (excluding the current note being edited)
-    const duplicateExists = loadedFiles.some((file, i) => 
+    const duplicateExists = loadedFiles.some((file, i) =>
       i !== index && file.name === trimmedName
     )
 
@@ -247,7 +245,7 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
         description: `A note with the name "${trimmedName}" already exists.`,
         variant: "destructive",
       })
-      
+
       // Revert to "New Note" if duplicate found
       setLoadedFiles(prev => prev.map((file, i) =>
         i === index ? { ...file, name: "New Note", isEditing: false } : file
@@ -257,7 +255,7 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
         i === index ? { ...file, name: trimmedName || "New Note", isEditing: false } : file
       ))
     }
-    
+
     setEditingName("")
   }
 
@@ -299,12 +297,12 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
             >
               {isDarkTheme ? (
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="5"/>
-                  <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                  <circle cx="12" cy="12" r="5" />
+                  <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
                 </svg>
               ) : (
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-600">
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                 </svg>
               )}
             </Button>
@@ -422,7 +420,7 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
 
       {/* Hidden file input for .snt files */}
       <input ref={fileInputRef} type="file" accept=".snt" onChange={handleFileChange} className="hidden" />
-      
+
       {/* Confirmation dialog */}
       <ConfirmSaveForm
         fileName={fileToClose?.file.name || ""}

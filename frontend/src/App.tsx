@@ -1,23 +1,23 @@
-"use client"
-
-import { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { Topbar } from "@/components/Topbar"
 import { Sidebar, type SidebarHandle } from "@/components/Sidebar"
 import { TextEditor, type EditorHandle } from "@/components/TextEditor"
 import { isOnDesktop, WebSafeConfig } from "@/utils/utils"
 import WelcomeSetupForm from "@/components/setup/WelcomeSetupForm"
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast"
 import SelectNotesDirForm from "@/components/setup/SelectNotesDirForm"
 import { LoadAllSntFiles, LoadedFile, createNewNote } from "@/utils/file_manager"
 import { initializeTheme } from "@/utils/utils"
 import { useToolbarHandler } from "@/hooks/use-handle-toolbar"
 import { useStylesManager } from "@/hooks/use-styles-manager"
 import { useFontSizeManager } from "@/hooks/use-font-size-manager"
+import { Toaster } from "@/components/ui/toaster"
+import { ThemeProvider } from "@/components/theme-provider"
 
 type FontStyle = "normal" | "retro" | "stylish"
 
-export default function Page() {
+function App() {
   const [showWelcome, setShowWelcome] = useState(false)
   const [showNotesDirForm, setShowNotesDirForm] = useState(false)
 
@@ -78,7 +78,6 @@ export default function Page() {
     initialize();
   }, [])
 
-
   const updateCharacterCount = useCallback(() => {
     const content = editorRef.current?.getHtmlContent() || ""
     const textContent = content.replace(/<[^>]*>/g, '')
@@ -131,51 +130,72 @@ export default function Page() {
 
   if (showWelcome) {
     if (configLoaded !== null && configLoaded.userSelectedDirectory === "") {
-      return <WelcomeSetupForm conf={configLoaded} onNext={handleWelcomeNext} />
+      return (
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <div className="antialiased font-sans">
+            <WelcomeSetupForm conf={configLoaded} onNext={handleWelcomeNext} />
+            <Toaster />
+          </div>
+        </ThemeProvider>
+      )
     }
   }
 
   if (showNotesDirForm) {
     if (configLoaded !== null && configLoaded.userSelectedDirectory === "") {
-      return <SelectNotesDirForm conf={configLoaded} onComplete={handleSetupComplete} />
+      return (
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <div className="antialiased font-sans">
+            <SelectNotesDirForm conf={configLoaded} onComplete={handleSetupComplete} />
+            <Toaster />
+          </div>
+        </ThemeProvider>
+      )
     }
   }
 
   return (
-    <div className={cn("h-screen gradient-bg flex flex-col")}>
-      <Topbar
-        visible={toolbarVisible}
-        pinned={toolbarPinned}
-        onTogglePinned={() => setToolbarPinned((p) => !p)}
-        fontStyle={fontStyle}
-        onFontStyleChange={setFontStyle}
-        stylesManager={stylesManager}
-        fontSizeManager={fontSizeManager}
-        onToggleStyle={(key) => editorRef.current?.toggleStyle(key)}
-      />
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <div className="antialiased font-sans">
+        <div className={cn("h-screen gradient-bg flex flex-col")}>
+          <Topbar
+            visible={toolbarVisible}
+            pinned={toolbarPinned}
+            onTogglePinned={() => setToolbarPinned((p) => !p)}
+            fontStyle={fontStyle}
+            onFontStyleChange={setFontStyle}
+            stylesManager={stylesManager}
+            fontSizeManager={fontSizeManager}
+            onToggleStyle={(key) => editorRef.current?.toggleStyle(key)}
+          />
 
-      <div className="flex flex-1 h-full min-h-0">
-        <Sidebar
-          ref={sidebarRef}
-          collapsed={sidebarCollapsed}
-          onToggle={() => setSidebarCollapsed((c) => !c)}
-          onLoad={handleLoad}
-          onSave={handleSave}
-          getCurrentContent={handleGetCurrentContent}
-          fontStyle={fontStyle}
-          characterCount={characterCount}
-          onContentChange={handleContentChange}
-          initialFiles={initialFiles}
-        />
-        <TextEditor 
-          ref={editorRef} 
-          fontStyle={fontStyle} 
-          onBodyClick={handleBodyClick} 
-          onContentChange={handleContentChange}
-          stylesManager={stylesManager}
-          fontSizeManager={fontSizeManager}
-        />
+          <div className="flex flex-1 h-full min-h-0">
+            <Sidebar
+              ref={sidebarRef}
+              collapsed={sidebarCollapsed}
+              onToggle={() => setSidebarCollapsed((c) => !c)}
+              onLoad={handleLoad}
+              onSave={handleSave}
+              getCurrentContent={handleGetCurrentContent}
+              fontStyle={fontStyle}
+              characterCount={characterCount}
+              onContentChange={handleContentChange}
+              initialFiles={initialFiles}
+            />
+            <TextEditor 
+              ref={editorRef} 
+              fontStyle={fontStyle} 
+              onBodyClick={handleBodyClick} 
+              onContentChange={handleContentChange}
+              stylesManager={stylesManager}
+              fontSizeManager={fontSizeManager}
+            />
+          </div>
+        </div>
+        <Toaster />
       </div>
-    </div>
+    </ThemeProvider>
   )
 }
+
+export default App

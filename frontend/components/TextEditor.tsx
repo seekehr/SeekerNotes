@@ -1,4 +1,3 @@
-"use client"
 import { forwardRef, useImperativeHandle, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { FontStyle, htmlToSnt, sntToHtml } from "@/utils/parser"
