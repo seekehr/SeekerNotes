@@ -13,6 +13,7 @@ import { LoadAllSntFiles, LoadedFile, createNewNote } from "@/utils/file_manager
 import { initializeTheme } from "@/utils/utils"
 import { useToolbarHandler } from "@/hooks/use-handle-toolbar"
 import { useStylesManager } from "@/hooks/use-styles-manager"
+import { useFontSizeManager } from "@/hooks/use-font-size-manager"
 
 type FontStyle = "normal" | "retro" | "stylish"
 
@@ -29,6 +30,7 @@ export default function Page() {
 
   const [fontStyle, setFontStyle] = useState<FontStyle>("normal")
   const stylesManager = useStylesManager()
+  const fontSizeManager = useFontSizeManager()
   const [characterCount, setCharacterCount] = useState(0)
 
   const editorRef = useRef<EditorHandle | null>(null)
@@ -148,8 +150,8 @@ export default function Page() {
         fontStyle={fontStyle}
         onFontStyleChange={setFontStyle}
         stylesManager={stylesManager}
+        fontSizeManager={fontSizeManager}
         onToggleStyle={(key) => editorRef.current?.toggleStyle(key)}
-        onApplyFontSize={(size) => editorRef.current?.applyFontSize(size)}
       />
 
       <div className="flex flex-1 h-full min-h-0">
@@ -171,6 +173,7 @@ export default function Page() {
           onBodyClick={handleBodyClick} 
           onContentChange={handleContentChange}
           stylesManager={stylesManager}
+          fontSizeManager={fontSizeManager}
         />
       </div>
     </div>

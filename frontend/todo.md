@@ -1,2 +1,2 @@
-# todo: fix topbar's B, I U not highlighting when u click on them, or press ctrl + shortcut.
-# also make it so if the text theyre holding is highlighted, they highlight too.
+# todo: fix fontsize.
+# todo: re-add all my v helpful comments. maybe ask AI to do it and then humanise them.

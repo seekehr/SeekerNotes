@@ -309,11 +309,16 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
               )}
             </Button>
           </div>
-          <div className="flex gap-1">
+          <div className={cn("flex", collapsed ? "flex-col gap-1" : "gap-1")}>
             <Button
               variant="outline"
               size="sm"
-              onClick={handleNewNote}
+              onClick={() => {
+                if (collapsed) {
+                  onToggle()
+                }
+                handleNewNote()
+              }}
               aria-label="Create new note"
               className="h-8 w-8 p-0 bg-transparent"
             >
@@ -344,13 +349,13 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
             </div>
           )}
 
-          <nav className="flex flex-col gap-1">
+          <nav className={cn("flex flex-col gap-1", collapsed && "hidden")}>
             {loadedFiles.map((file, i) => (
               <div
                 key={i}
                 className={cn(
-                  "relative group rounded-md transition-all duration-200",
-                  activeFileIndex === i && "border-2 border-white/60 dark:border-gray-600/60 shadow-[0_0_10px_rgba(255,255,255,0.3)] dark:shadow-[0_0_10px_rgba(75,85,99,0.3)]"
+                  "relative group rounded-md",
+                  activeFileIndex === i && !collapsed && "border-2 border-white/60 dark:border-gray-600/60"
                 )}
               >
                 {file.isEditing && !collapsed ? (
@@ -370,7 +375,7 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
                   <button
                     className={cn(
                       "text-left w-full rounded-md px-3 py-2 pr-8 transition-colors",
-                      "hover:bg-[var(--color-accent)]/30 dark:hover:bg-purple-500/20",
+                      !collapsed && "hover:bg-[var(--color-accent)]/30 dark:hover:bg-purple-500/20",
                       activeFileIndex === i && "bg-transparent"
                     )}
                     title={file.name}
@@ -392,12 +397,7 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
 
                 {!collapsed && (
                   <button
-                    className={cn(
-                      "absolute top-1 right-1 w-5 h-5 rounded-full",
-                      "bg-white hover:bg-gray-100 text-red-600 text-xs",
-                      "opacity-0 group-hover:opacity-100 transition-opacity",
-                      "flex items-center justify-center font-bold shadow-sm"
-                    )}
+                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-transparent hover:bg-red-500/20 text-red-600 text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center font-bold"
                     onClick={(e) => handleCloseFile(i, e)}
                     title="Close file"
                   >
@@ -409,7 +409,7 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
           </nav>
         </div>
 
-        <div className="pt-2 space-y-2">
+        <div className={cn("pt-2 space-y-2", collapsed && "hidden")}>
           <Button className="w-full bg-transparent" variant="outline" onClick={handleLoadClick}>
             {collapsed ? "↑" : "Load"}
           </Button>
@@ -417,8 +417,6 @@ export const Sidebar = forwardRef<SidebarHandle, SidebarProps>(function Sidebar(
           <Button className="w-full bg-transparent" variant="outline" onClick={handleSaveClick}>
             {collapsed ? "💾" : "Save"}
           </Button>
-
-
         </div>
       </div>
 

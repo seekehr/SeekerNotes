@@ -6,7 +6,6 @@ import { StyleKey } from "@/hooks/use-styles-manager"
 
 export interface EditorHandle {
   toggleStyle: (key: StyleKey) => void
-  applyFontSize: (size: number) => void
   getSntContent: () => Promise<string>
   setSntContent: (content: string) => void
   getHtmlContent: () => string
@@ -21,13 +20,17 @@ interface EditorProps {
     isStyleActive: (key: StyleKey) => boolean
     activeStyles: Set<StyleKey>
     updateActiveStyles: () => void
+  }
+  fontSizeManager: {
     fontSize: number
     setFontSize: (size: number) => void
+    applyFontSize: (size: number) => void
+    getCurrentFontSize: () => number
   }
 }
 
 export const TextEditor = forwardRef<EditorHandle, EditorProps>(function TextEditor(props, ref) {
-  const { fontStyle, onBodyClick, onContentChange, stylesManager } = props
+  const { fontStyle, onBodyClick, onContentChange, stylesManager, fontSizeManager } = props
   const editorRef = useRef<HTMLDivElement>(null)
 
   const pickFont = (fontStyle: FontStyle): [string, string] => {
@@ -56,12 +59,6 @@ export const TextEditor = forwardRef<EditorHandle, EditorProps>(function TextEdi
       setTimeout(() => {
         document.dispatchEvent(new Event('selectionchange'))
       }, 0)
-    },
-
-    applyFontSize(size: number) {
-      if (editorRef.current) {
-        editorRef.current.style.fontSize = `${size}px`
-      }
     },
 
     async getSntContent() {
@@ -99,7 +96,6 @@ export const TextEditor = forwardRef<EditorHandle, EditorProps>(function TextEdi
             fontFamily: family,
             letterSpacing: letterSpacing,
             minHeight: "100vh",
-            fontSize: `${stylesManager.fontSize}px`,
           }}
         >
           <p>

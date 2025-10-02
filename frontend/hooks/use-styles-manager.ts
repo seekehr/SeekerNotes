@@ -28,7 +28,6 @@ export type StyleKey = keyof typeof STYLE_CONFIG
 
 export function useStylesManager() {
   const [activeStyles, setActiveStyles] = useState<Set<StyleKey>>(new Set())
-  const [fontSize, setFontSize] = useState<number>(16)
   const isTogglingRef = useRef(false)
 
   const toggleStyle = useCallback((styleKey: StyleKey) => {
@@ -283,8 +282,6 @@ export function useStylesManager() {
     toggleStyle,
     isStyleActive,
     activeStyles,
-    updateActiveStyles,
-    fontSize,
-    setFontSize
+    updateActiveStyles
   }
 }

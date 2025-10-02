@@ -19,11 +19,14 @@ export interface TopbarProps {
     isStyleActive: (key: StyleKey) => boolean
     activeStyles: Set<StyleKey>
     updateActiveStyles: () => void
+  }
+  fontSizeManager: {
     fontSize: number
     setFontSize: (size: number) => void
+    applyFontSize: (size: number) => void
+    getCurrentFontSize: () => number
   }
   onToggleStyle: (key: StyleKey) => void
-  onApplyFontSize: (size: number) => void
 }
 
 export function Topbar(props: TopbarProps) {
@@ -34,9 +37,11 @@ export function Topbar(props: TopbarProps) {
     fontStyle,
     onFontStyleChange,
     stylesManager,
+    fontSizeManager,
     onToggleStyle,
-    onApplyFontSize,
   } = props
+
+  const currentSize = fontSizeManager.getCurrentFontSize()
 
   const barClass = useMemo(
     () =>
@@ -68,19 +73,20 @@ export function Topbar(props: TopbarProps) {
             <span className="text-xs opacity-80">Size</span>
             <div className="w-40">
               <Slider
-                value={[stylesManager.fontSize]}
+                value={[currentSize]}
                 min={4}
                 max={30}
                 step={1}
                 onValueChange={(v) => {
-                  const newSize = v[0] ?? stylesManager.fontSize
-                  stylesManager.setFontSize(newSize)
-                  onApplyFontSize(newSize)
+                  fontSizeManager.setFontSize(v[0] ?? currentSize)
+                }}
+                onValueCommit={(v) => {
+                  fontSizeManager.applyFontSize(v[0] ?? currentSize)
                 }}
                 aria-label="Font size"
               />
             </div>
-            <span className="text-xs tabular-nums w-6 text-center">{stylesManager.fontSize}</span>
+            <span className="text-xs tabular-nums w-6 text-center">{currentSize}</span>
           </div>
 
           <div className="flex items-center gap-2 ml-1">
